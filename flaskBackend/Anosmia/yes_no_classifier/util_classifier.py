@@ -7,11 +7,11 @@ import pickle
 import numpy as np
 from io import StringIO
 
-
+df = pd.read_csv('./Anosmia/yes_no_classifier/data.txt', delimiter = ",")
+count_vect = CountVectorizer()
 
 def getData(df):
-    df = pd.read_csv('data.txt', delimiter=",")
-    count_vect = CountVectorizer()
+
     col = ['answer', 'phrase']
     df = df[col]
     df = df[pd.notnull(df['phrase'])]
