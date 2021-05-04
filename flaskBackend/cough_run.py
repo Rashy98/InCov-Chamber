@@ -125,7 +125,7 @@ def predict():
     # print("preds:" ,preds)
     # print(categories[np.argmax(preds[0])])
     # print(preds[0][np.argmax(preds[0])])
-
+    # print(preds)
     return (preds)
 
 def sendPrediction():

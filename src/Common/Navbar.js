@@ -7,7 +7,7 @@ import nav from "../assets/css/navbar.css";
 import DashboardComponent from "./DashboardComponent";
 // import axios from "axios";
 // import { withRouter } from 'react-router-dom';
-import background from "./../assets/Images/NavBack.jpg"
+import background from "../assets/Images/NavBack.jpg";
 import Icon from "@material-ui/core/Icon";
 import {ListItemIcon} from "@material-ui/core";
 import Dashboard from "@material-ui/icons/Dashboard";
