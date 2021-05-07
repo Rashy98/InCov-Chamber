@@ -27,6 +27,7 @@
     "react-scripts": "4.0.3",
     "react-speech": "^1.0.2",
     "react-voice-recorder": "^2.0.9",
+    "text-to-speech-js": "^1.1.10",
     "wait-on": "^5.3.0",
     "web-vitals": "^1.0.1"
   },

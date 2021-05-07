@@ -3,7 +3,7 @@ from flask_cors import CORS
 import io
 import tensorflow as tf
 import base64
-from PIL import Image
+# from PIL import Image
 from keras.applications.vgg16 import VGG16
 from keras.preprocessing import image
 from keras.models import Sequential, load_model

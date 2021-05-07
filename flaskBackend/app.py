@@ -3,8 +3,9 @@ from flask import Flask, request, jsonify,render_template, redirect, url_for
 from flask_cors import CORS
 # from cough_run import coughResemb
 import cough_run
+import anosmia_run
 from cough.AudioRecording import recordAudio
-from cough.CreateSpectogram import  Create_spectogram
+from cough.CreateSpectogram import Create_spectogram
 import os
 import wave
 
@@ -27,6 +28,12 @@ def say_hello_world():
 @app.route("/predictCough", methods=["GET","POST"])
 def detection():
     return jsonify(cough_run.sendPrediction())
+
+
+@app.route("/anosmia", methods=["GET","POST"])
+def anosmia():
+    return jsonify(anosmia_run.anosmiaChecker())
+
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5000)
