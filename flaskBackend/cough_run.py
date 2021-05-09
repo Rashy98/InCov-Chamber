@@ -19,6 +19,11 @@ import json
 import logging
 from keras.models import model_from_json
 from keras.layers import Layer
+from cough.AudioRecording import audioRecorder
+import time
+from cough.CreateSpectogram import Create_spectogram
+import os
+from scipy.io.wavfile import write
 
 
 class LabelLimitLayer(Layer):
@@ -128,21 +133,24 @@ def predict():
     # print(preds)
     return (preds)
 
-def sendPrediction():
-    preds = predict()
-    print(preds)
-    response = {
-        'prediction_label': categories[np.argmax(preds[0])],
-        'percentage' : str(preds[0][np.argmax(preds[0])])
-    }
-    return response
-
 
 def detect():
+    image_prediction = image.load_img('./spectograms/spectogram.png', target_size=(224, 224))
     x = image.img_to_array(image_prediction)
     x = np.expand_dims(x, axis=0)* 1./255
     predDe = detectModel.predict(x)
     return detect_categories[np.argmax(predDe[0])]
+
+
+def sendPrediction():
+    if detect() == 'coughing':
+        preds = predict()
+        print(preds)
+        response = {
+            'prediction_label': categories[np.argmax(preds[0])],
+            'percentage': str(preds[0][np.argmax(preds[0])])
+        }
+        return response
 
 
 def coughResemb():
@@ -151,4 +159,20 @@ def coughResemb():
     else:
         print('No cough found')
 
+def recordCough():
+    recording = audioRecorder.recordCough()
+    write('cough.wav', 44100, recording)
+    time.sleep(8)
+    coughRecording = 'cough.wav'
+    # Create_spectogram.createWavelets(coughRecording)
 
+    if (os.stat('cough.wav').st_size == 0):
+        'No audio'
+    else:
+        coughRecording = 'cough.wav'
+        Create_spectogram.createWavelets(cough=coughRecording)
+
+    return 'Recording done'
+
+
+recordCough()

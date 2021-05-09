@@ -8,6 +8,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import Speech from 'react-speech';
 import audio from './../sound/welcome.wav'
 import anosmia01 from './../sound/anosmia01.wav'
+import ask_to_cough from './../sound/ask_to_cough.wav'
 
 
 
@@ -42,16 +43,19 @@ export default class DetailedDashboard extends PureComponent {
         this.AnosmiaPrediction = this.AnosmiaPrediction.bind(this)
         this.playAudio = this.playAudio.bind(this)
         this.AnosmiaGetData = this.AnosmiaGetData.bind(this)
+        this.CoughRecording = this.CoughRecording.bind(this)
+        this.PlayCoughSaying = this.PlayCoughSaying.bind(this)
     }
 
 
     componentDidMount() {
-        this.PREDICTION()
+        // this.PREDICTION()
 
         const audioEl = document.getElementsByClassName("audio-element")[0]
         // const audioEl2 = document.getElementsByClassName("audio-element-2")[0]
         audioEl.play()
-        setTimeout(this.AnosmiaGetData,15000);
+        setTimeout(this.AnosmiaGetData,10000);
+        setTimeout(this.PlayCoughSaying,20000);
         // setTimeout(audioEl2.play(),10000);
     }
 
@@ -69,6 +73,32 @@ export default class DetailedDashboard extends PureComponent {
             })
         }
     }
+
+    PlayCoughSaying(){
+        this.audio = new Audio(ask_to_cough)
+        this.audio.load()
+        this.playAudio()
+        let value = '';
+
+        setTimeout(this.CoughRecording,5000);
+        //
+        //
+
+    }
+
+    CoughRecording(){
+         fetch('/recordCough', {
+            method: 'GET',
+            // body: JSON.stringify(payload),
+        }).then((response) => {
+            response.json().then((body) => {
+                console.log(response)
+            });
+        });
+        setTimeout(this.PREDICTION,6000)
+
+    }
+
 
     PREDICTION(){
         let value = '';
