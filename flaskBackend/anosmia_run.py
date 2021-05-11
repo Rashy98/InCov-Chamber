@@ -11,6 +11,7 @@ from Anosmia.fragrance_type_classifier import fragrance_type_classifier
 
 
 status = ""
+arduinoValue = 0
 
 def anosmiaChecker():
 
@@ -40,30 +41,31 @@ def anosmiaChecker():
     print(arduinoValue)
 
     # ----------------------------Comparing---------------------------------
-
-
-    if(classifierValue == 'yes' and float(arduinoValue) > threshold_value):
-        status = 'healthy'
-        print('healthy')
-
-    elif (classifierValue == 'yes' and float(arduinoValue) < threshold_value):
-        status = 'prashnayak'
-        print('prashnayak')
-
-    elif (classifierValue == 'no' and float(arduinoValue) < threshold_value):
-        status = 'healthy'
-        print('healthy')
-
-    else:
-        status = 'anosmia'
-        print('Anosmia');
+    #
+    # if(classifierValue == 'yes' and float(arduinoValue) > threshold_value):
+    #     status = 'healthy'
+    #     print('healthy')
+    #
+    # elif (classifierValue == 'yes' and float(arduinoValue) < threshold_value):
+    #     status = 'prashnayak'
+    #     print('prashnayak')
+    #
+    # elif (classifierValue == 'no' and float(arduinoValue) < threshold_value):
+    #     status = 'healthy'
+    #     print('healthy')
+    #
+    # else:
+    #     status = 'anosmia'
+    #     print('Anosmia');
 
 
     Anosmia_response = {
-       'status':status
+        'classifier_value':classifierValue,
+        # 'arduino_value':float(arduinoValue),
       }
 
     return Anosmia_response
 
 
-
+def getArduinoValue():
+    return arduinoValue

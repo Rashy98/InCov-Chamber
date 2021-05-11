@@ -8,6 +8,7 @@ import 'react-circular-progressbar/dist/styles.css';
 import Speech from 'react-speech';
 import audio from './../sound/welcome.wav'
 import anosmia01 from './../sound/anosmia01.wav'
+import anosmia02 from './../sound/anosmia02.wav'
 import ask_to_cough from './../sound/ask_to_cough.wav'
 
 
@@ -29,6 +30,8 @@ export default class DetailedDashboard extends PureComponent {
                     s:0
                 }
             },
+            anosmia_classifier_value:'',
+            arduino_value:0,
             audioClip:'',
             placeholder :'hi',
             placeholder2 :'cough?',
@@ -45,6 +48,7 @@ export default class DetailedDashboard extends PureComponent {
         this.AnosmiaGetData = this.AnosmiaGetData.bind(this)
         this.CoughRecording = this.CoughRecording.bind(this)
         this.PlayCoughSaying = this.PlayCoughSaying.bind(this)
+        this.soundCommand = this.soundCommand.bind(this)
     }
 
 
@@ -54,11 +58,14 @@ export default class DetailedDashboard extends PureComponent {
         const audioEl = document.getElementsByClassName("audio-element")[0]
         // const audioEl2 = document.getElementsByClassName("audio-element-2")[0]
         audioEl.play()
-        setTimeout(this.AnosmiaGetData,10000);
-        setTimeout(this.PlayCoughSaying,20000);
+        this.soundCommand()
         // setTimeout(audioEl2.play(),10000);
     }
 
+    soundCommand(){
+         setTimeout(this.AnosmiaGetData,8000);
+        setTimeout(this.PlayCoughSaying,24000);
+    }
 
     playAudio() {
         const audioPromise = this.audio.play()
@@ -80,7 +87,7 @@ export default class DetailedDashboard extends PureComponent {
         this.playAudio()
         let value = '';
 
-        setTimeout(this.CoughRecording,5000);
+        setTimeout(this.CoughRecording,4200);
         //
         //
 
@@ -132,21 +139,65 @@ export default class DetailedDashboard extends PureComponent {
         this.audio = new Audio(anosmia01)
         this.audio.load()
         this.playAudio()
-        fetch('/anosmia', {
+        setTimeout(fetch('/anosmia', {
             method: 'GET',
             // body: JSON.stringify(payload),
         }).then((response) => {
             response.json().then((body) => {
                 console.log(response)
+                if (body.classifier_value == ''){
+                    this.soundCommand()
+                }
+                else {
+
+                    this.setState({
+                        anosmia_classifier_value: body.classifier_value,
+
+
+                    })
+
+
+                if(body.classifier_value == 'yes'){
+                    setTimeout(this.getAnosmiaFragrance(),2000)
+                }
+                else{
+                    if(parseFloat(body.arduino_value) > 1500 ){
+                        this.setState({
+                            anosmia_status:'Anosmia'
+                        })
+                    }
+                    else{
+                         this.setState({
+                            anosmia_status:'Healthy'
+                        })
+                    }
+                }
+
+            }});
+
+        }),1200)
+    }
+
+    getAnosmiaFragrance(){
+        this.audio = new Audio(anosmia02)
+        this.audio.load()
+        this.playAudio()
+
+        // console.log(JSON.stringify(sendData))
+        fetch('/anosmiaFrag', {
+            method: 'POST',
+            // body: JSON.stringify(sendData),
+        }).then((response) => {
+            response.json().then((body) => {
+                console.log(response)
                 this.setState({
                     anosmia_status : body.status,
-
+                    // predictPercentage : body.percentage,
                 })
 
             });
         });
     }
-
 
     render() {
         return (
@@ -208,10 +259,10 @@ export default class DetailedDashboard extends PureComponent {
 
                         </div>
                         <div style={{marginLeft:'5em'}}></div>
-                        <DashboardComponent  Count={this.state.predictPercentage} subTitle={this.state.predictLabel} heightC='15em' widthC='15em' color1='#ff9900' color2='#ffcc00' iconColor="success"  range="Cough Percentage"/>
+                        <DashboardComponent  Count={this.state.predictPercentage} subTitle={this.state.predictLabel.toUpperCase()} heightC='15em' widthC='15em' color1='#ff9900' color2='#ffcc00' iconColor="success"  range="Cough Percentage"/>
                     </div>
                     <div style={{marginLeft:'0em',textAlign: 'center',marginTop:'-5em'}} className='form-inline'>
-                        <DashboardComponent  Count={this.state.anosmia_status} subTitle='' heightC='15em' widthC='15em' color1='#ff9900' color2='#ffcc00' iconColor="success"  range="Anosmia"/>
+                        <DashboardComponent  Count={this.state.anosmia_status.toUpperCase()} subTitle='' heightC='15em' widthC='15em' color1='#ff9900' color2='#ffcc00' iconColor="success"  range="Anosmia"/>
                         <div style={{marginLeft:'10em',width: 200, height: 300,}} ></div>
                         <DashboardComponent  Count='' subTitle='' heightC='15em' widthC='15em' color1='#ff9900' color2='#ffcc00' iconColor="success"  range="Shortness of Breath"/>
 

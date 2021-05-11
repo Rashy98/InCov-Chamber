@@ -6,6 +6,8 @@ from flask_cors import CORS
 # from cough_run import coughResemb
 import cough_run
 import anosmia_run
+import anosmia_fragrance_classifier_run
+
 from cough.AudioRecording import recordAudio
 from cough.CreateSpectogram import Create_spectogram
 import os
@@ -33,6 +35,12 @@ def say_hello_world():
 @app.route("/predictCough", methods=["GET","POST"])
 def detection():
     return jsonify(cough_run.sendPrediction())
+
+@app.route("/anosmiaFrag", methods=["POST"])
+def anosmiaFrag():
+
+    return jsonify(anosmia_fragrance_classifier_run.anosmiaFragChecker())
+
 
 
 @app.route("/anosmia", methods=["GET","POST"])

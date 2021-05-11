@@ -23,7 +23,7 @@ from cough.AudioRecording import audioRecorder
 import time
 from cough.CreateSpectogram import Create_spectogram
 import os
-from scipy.io.wavfile import write
+from scipy.io.wavfile import write,read
 
 
 class LabelLimitLayer(Layer):
@@ -142,6 +142,7 @@ def detect():
     return detect_categories[np.argmax(predDe[0])]
 
 
+# print(detect())
 def sendPrediction():
     if detect() == 'coughing':
         preds = predict()
@@ -151,7 +152,8 @@ def sendPrediction():
             'percentage': str(preds[0][np.argmax(preds[0])])
         }
         return response
-
+    else:
+        return 'non - cough'
 
 def coughResemb():
     if (detect() == 'coughing'):
@@ -163,8 +165,9 @@ def recordCough():
     recording = audioRecorder.recordCough()
     write('cough.wav', 44100, recording)
     time.sleep(8)
-    coughRecording = 'cough.wav'
+    coughRecording = read('cough.wav')
     # Create_spectogram.createWavelets(coughRecording)
+    # print(np.count_nonzero(np.array(coughRecording[1], dtype=np.float)))
 
     if (os.stat('cough.wav').st_size == 0):
         'No audio'
@@ -174,5 +177,6 @@ def recordCough():
 
     return 'Recording done'
 
+# sendPrediction()
 
-recordCough()
+# recordCough()
