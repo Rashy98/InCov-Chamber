@@ -10,10 +10,8 @@ import audio from './../sound/welcome.wav'
 import anosmia01 from './../sound/anosmia01.wav'
 import anosmia02 from './../sound/anosmia02.wav'
 import ask_to_cough from './../sound/ask_to_cough.wav'
-
-
-
 import 'react-voice-recorder/dist/index.css'
+import axios from "axios";
 
 export default class DetailedDashboard extends PureComponent {
 
@@ -41,6 +39,7 @@ export default class DetailedDashboard extends PureComponent {
             predictLabel :'',
             predictPercentage : 0,
             anosmia_status : '',
+            employees :[]
         }
         this.PREDICTION = this.PREDICTION.bind(this)
         this.AnosmiaPrediction = this.AnosmiaPrediction.bind(this)
@@ -49,12 +48,13 @@ export default class DetailedDashboard extends PureComponent {
         this.CoughRecording = this.CoughRecording.bind(this)
         this.PlayCoughSaying = this.PlayCoughSaying.bind(this)
         this.soundCommand = this.soundCommand.bind(this)
+        this.getEmployee = this.getEmployee.bind(this)
     }
 
 
     componentDidMount() {
         // this.PREDICTION()
-
+        this.getEmployee()
         const audioEl = document.getElementsByClassName("audio-element")[0]
         // const audioEl2 = document.getElementsByClassName("audio-element-2")[0]
         audioEl.play()
@@ -62,9 +62,27 @@ export default class DetailedDashboard extends PureComponent {
         // setTimeout(audioEl2.play(),10000);
     }
 
+    getEmployee(){
+
+      axios.get('http://localhost:8000/employee/')
+            .then(res => {
+                console.log(res.data[0])
+                this.setState({
+                    employees: res.data[0]
+                })
+            });
+            // response.json().then((body) => {
+            //     this.setState({
+            //          employees : body,
+            //         // predictPercentage : parseFloat(body.percentage) * 100 +" %"  ,
+            //     })
+            //
+            // });
+    }
+
     soundCommand(){
          setTimeout(this.AnosmiaGetData,8000);
-        setTimeout(this.PlayCoughSaying,24000);
+         setTimeout(this.PlayCoughSaying,24000);
     }
 
     playAudio() {
@@ -102,7 +120,8 @@ export default class DetailedDashboard extends PureComponent {
                 console.log(response)
             });
         });
-        setTimeout(this.PREDICTION,6000)
+         setTimeout(this.PREDICTION,8000)
+
 
     }
 
@@ -117,7 +136,7 @@ export default class DetailedDashboard extends PureComponent {
                 console.log(response)
                 this.setState({
                     predictLabel : body.prediction_label,
-                    predictPercentage : body.percentage,
+                    predictPercentage : parseFloat(body.percentage) * 100 +" %"  ,
                 })
 
             });
@@ -199,6 +218,7 @@ export default class DetailedDashboard extends PureComponent {
         });
     }
 
+
     render() {
         return (
             <div style={{textAlign: 'center'}}>
@@ -211,15 +231,9 @@ export default class DetailedDashboard extends PureComponent {
                               <source src={audio}></source>
                             </audio>
                         </div>
-                        {/*<div>*/}
-                        {/*    <audio className="audio-element-2" wait ={10000}>*/}
-                        {/*      <source src={anosmia01}></source>*/}
-                        {/*    </audio>*/}
-                        {/*</div>*/}
-                        {/*{this.AnosmiaPrediction()}*/}
                         <DashboardComponent Count='' subTitle='' heightC='20em' widthC='20em' color1='#ff9900' color2='#ffcc00' iconColor="success" iconC=<SupervisorAccountIcon/> photo={logo}/>
                         <div style={{marginLeft:'5em'}}>
-                            <h1>Rashini Liyanarachchi</h1>
+                            <h1>{this.state.employees.fullName}</h1>
                             <br />
                             <h3>Employee</h3>
                         </div>

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import os
 
 import matplotlib.pyplot as plt
+# import flaskBackend
 from scipy import signal
 from scipy.io import wavfile
 
@@ -31,6 +32,7 @@ def createWavelets(cough):
     librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
     plt.savefig( './spectograms/spectogram.png', dpi = 300)
     print('----------spectogram saved--------------')
+    # return 'created'
 
 # createWavelets('')
 # createWavelets('')

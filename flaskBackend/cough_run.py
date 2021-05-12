@@ -141,10 +141,9 @@ def detect():
     predDe = detectModel.predict(x)
     return detect_categories[np.argmax(predDe[0])]
 
-
-# print(detect())
 def sendPrediction():
     if detect() == 'coughing':
+        print(detect())
         preds = predict()
         print(preds)
         response = {
@@ -153,7 +152,10 @@ def sendPrediction():
         }
         return response
     else:
-        return 'non - cough'
+        response = {
+            'prediction_label': 'no cough',
+        }
+        return response
 
 def coughResemb():
     if (detect() == 'coughing'):
@@ -164,11 +166,9 @@ def coughResemb():
 def recordCough():
     recording = audioRecorder.recordCough()
     write('cough.wav', 44100, recording)
-    time.sleep(8)
-    coughRecording = read('cough.wav')
-    # Create_spectogram.createWavelets(coughRecording)
-    # print(np.count_nonzero(np.array(coughRecording[1], dtype=np.float)))
-
+    # time.sleep(8)
+    # coughRecording = read('cough.wav')
+    # Create_spectogram.createWavelets(recording)
     if (os.stat('cough.wav').st_size == 0):
         'No audio'
     else:
@@ -177,6 +177,8 @@ def recordCough():
 
     return 'Recording done'
 
-# sendPrediction()
+
+# print(detect())
 
 # recordCough()
+# Create_spectogram.createWavelets(cough='cough.wav')

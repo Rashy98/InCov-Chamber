@@ -27,7 +27,7 @@ top_model.add(Dropout(0.5))
 top_model.add(Dense(2, activation='softmax'))
 model = Model(inputs=base_model.input, outputs=top_model(base_model.output))
 
-# model = tf.keras.models.load_model('myVggModel.h5')
+# model = tf.keras.models.load_model('myVggCoughDetectionModel.h5')
 
 loss_object = tf.keras.losses.SparseCategoricalCrossentropy()
 
@@ -52,7 +52,7 @@ def train_step(images, labels):
 
 
 
-for epoch in range(1):
+for epoch in range(2):
     train_loss.reset_states()
     train_accuracy.reset_states()
 
