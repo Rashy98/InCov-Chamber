@@ -128,4 +128,6 @@ def Fever_start():
     capture.release()
     cv.destroyAllWindows()
 
+    #check
+
 Fever_start()
