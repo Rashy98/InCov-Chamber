@@ -39,7 +39,8 @@ export default class DetailedDashboard extends PureComponent {
             predictLabel :'',
             predictPercentage : 0,
             anosmia_status : '',
-            employees :[]
+            employees :[],
+            breath_count:0
         }
         this.PREDICTION = this.PREDICTION.bind(this)
         this.AnosmiaPrediction = this.AnosmiaPrediction.bind(this)
@@ -49,6 +50,7 @@ export default class DetailedDashboard extends PureComponent {
         this.PlayCoughSaying = this.PlayCoughSaying.bind(this)
         this.soundCommand = this.soundCommand.bind(this)
         this.getEmployee = this.getEmployee.bind(this)
+        this.SOB = this.SOB.bind(this)
     }
 
 
@@ -59,6 +61,7 @@ export default class DetailedDashboard extends PureComponent {
         // const audioEl2 = document.getElementsByClassName("audio-element-2")[0]
         audioEl.play()
         this.soundCommand()
+        this.SOB()
         // setTimeout(audioEl2.play(),10000);
     }
 
@@ -123,6 +126,19 @@ export default class DetailedDashboard extends PureComponent {
          setTimeout(this.PREDICTION,8000)
 
 
+    }
+
+    SOB(){
+        fetch('sob', {
+            method: 'GET'
+        }).then((response) => {
+            response.json().then((body) => {
+                console.log(body.breath_count)
+                this.setState({
+                    breath_count: body.breath_count * 2
+                })
+            })
+        })
     }
 
 
@@ -278,7 +294,7 @@ export default class DetailedDashboard extends PureComponent {
                     <div style={{marginLeft:'0em',textAlign: 'center',marginTop:'-5em'}} className='form-inline'>
                         <DashboardComponent  Count={this.state.anosmia_status.toUpperCase()} subTitle='' heightC='15em' widthC='15em' color1='#ff9900' color2='#ffcc00' iconColor="success"  range="Anosmia"/>
                         <div style={{marginLeft:'10em',width: 200, height: 300,}} ></div>
-                        <DashboardComponent  Count='' subTitle='' heightC='15em' widthC='15em' color1='#ff9900' color2='#ffcc00' iconColor="success"  range="Shortness of Breath"/>
+                        <DashboardComponent  Count={this.state.breath_count} subTitle='' heightC='15em' widthC='15em' color1='#ff9900' color2='#ffcc00' iconColor="success"  range="Shortness of Breath"/>
 
                     </div>
 
