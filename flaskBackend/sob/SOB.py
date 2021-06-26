@@ -12,6 +12,7 @@ feature_end = 36
 
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor('./sob/trainingModels/shape_predictor_68_face_landmarks.dat')
+# predictor = dlib.shape_predictor('./trainingModels/shape_predictor_68_face_landmarks.dat')
 
 def resizeImage(img):
     return imutils.resize(image=img, width=width_500)
@@ -102,10 +103,10 @@ def SOB_run():
     cap1.release()
     cv.destroyAllWindows()
 
-    result = {
-        'breath_count': breath_count
-    }
+    # result = {
+    #     'breath_count': breath_count
+    # }
 
-    return result
+    return breath_count
 
 # SOB_run()

@@ -8,6 +8,7 @@ import cough_run
 import anosmia_run
 import anosmia_fragrance_classifier_run
 from sob import SOB
+import thermal_module_run
 
 from cough.AudioRecording import recordAudio
 from cough.CreateSpectogram import Create_spectogram
@@ -48,9 +49,9 @@ def anosmiaFrag():
 def anosmia():
     return jsonify(anosmia_run.anosmiaChecker())
 
-@app.route("/sob", methods=["GET"])
+@app.route("/thermal_module", methods=["GET"])
 def sob():
-    return jsonify(SOB.SOB_run())
+    return jsonify(thermal_module_run.run_thermal_modules())
 
 if __name__ == "__main__":
     app.run(host='127.0.0.1', port=5000)
