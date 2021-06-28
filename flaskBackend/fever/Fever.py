@@ -3,7 +3,7 @@ import numpy as np
 import imutils
 import cv2 as cv
 
-capture = cv.VideoCapture(1)
+# capture = cv.VideoCapture(1)
 OCR_B = cv.imread('./fever/OCR-B.jpg')
 
 def getReference():
@@ -58,11 +58,11 @@ def getDigiCnts(group):
 
     return digitCnts
 
-def Fever_start():
+def Fever_start(cap1):
     tot = 0
     while tot == 0:
 
-        _, frame = capture.read()
+        _, frame = cap1.read()
         frame = imutils.resize(image=frame, width=500)
         cv.imshow('bgvfhdjk', frame)
         frame = frame[:50, :88]
@@ -125,7 +125,7 @@ def Fever_start():
             break
 
     print('Temperature ', tot)
-    capture.release()
+    # capture.release()
     cv.destroyAllWindows()
     return tot
     #check

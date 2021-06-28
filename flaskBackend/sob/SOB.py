@@ -43,9 +43,9 @@ def displayOutput(breath_count, roi_binary, roi, roi_thermal, clone, cap1_frame)
     cv.imshow("Clone", clone)
     cv.imshow("Thermal", cap1_frame)
 
-def SOB_run():
-    cap0 = cv.VideoCapture(0)
-    cap1 = cv.VideoCapture(1)
+def SOB_run(cap0, cap1):
+    # cap0 = cv.VideoCapture(0)
+    # cap1 = cv.VideoCapture(1)
 
     # low_green = np.array([50, 50, 55])
     # high_green = np.array([95, 255, 255])
@@ -99,8 +99,8 @@ def SOB_run():
         if cv.waitKey(20) & 0xFF == ord('q'):
             break
 
-    cap0.release()
-    cap1.release()
+    # cap0.release()
+    # cap1.release()
     cv.destroyAllWindows()
 
     # result = {

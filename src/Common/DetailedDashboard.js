@@ -41,7 +41,8 @@ export default class DetailedDashboard extends PureComponent {
             anosmia_status : '',
             employees :[],
             breath_count:0,
-            temperature: 0
+            temperature: 0,
+            emp_name: ''
         }
         this.PREDICTION = this.PREDICTION.bind(this)
         this.AnosmiaPrediction = this.AnosmiaPrediction.bind(this)
@@ -52,11 +53,13 @@ export default class DetailedDashboard extends PureComponent {
         this.soundCommand = this.soundCommand.bind(this)
         this.getEmployee = this.getEmployee.bind(this)
         this.thermal_module = this.thermal_module.bind(this)
+        this.auth_module = this.auth_module.bind(this)
     }
 
 
-    componentDidMount() {
+    async componentDidMount() {
         // this.PREDICTION()
+        await this.auth_module()
         this.getEmployee()
         const audioEl = document.getElementsByClassName("audio-element")[0]
         // const audioEl2 = document.getElementsByClassName("audio-element-2")[0]
@@ -142,6 +145,20 @@ export default class DetailedDashboard extends PureComponent {
         })
     }
 
+    async auth_module(){
+        await fetch('face_auth', {
+            method: 'GET'
+        }).then((response) => {
+            response.json().then((body) => {
+                this.setState({
+                    emp_name: body.emp_name
+                })
+            })
+        })
+        // this.setState({
+        //     emp_name: name
+        // })
+    }
 
     PREDICTION(){
         let value = '';
@@ -235,7 +252,6 @@ export default class DetailedDashboard extends PureComponent {
         });
     }
 
-
     render() {
         return (
             <div style={{textAlign: 'center'}}>
@@ -250,7 +266,7 @@ export default class DetailedDashboard extends PureComponent {
                         </div>
                         <DashboardComponent Count='37.7' subTitle='' heightC='20em' widthC='20em' color1='#ff9900' color2='#ffcc00' iconColor="success" iconC=<SupervisorAccountIcon/> photo={logo}/>
                         <div style={{marginLeft:'5em'}}>
-                            <h1>{this.state.employees.fullName}</h1>
+                            <h1>{this.state.emp_name}</h1>
                             <br />
                             <h3>Employee</h3>
                         </div>

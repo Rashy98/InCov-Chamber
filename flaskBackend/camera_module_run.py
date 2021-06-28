@@ -1,0 +1,33 @@
+import cv2 as cv
+
+from fever import Fever
+from sob import SOB
+from FaceRecognition import FaceRecog
+
+cap0 = cv.VideoCapture(0)
+cap1 = cv.VideoCapture(1)
+
+def run_auth_module():
+    emp_name = FaceRecog.run_face_recog(cap0)
+
+    result = {
+        'emp_name': emp_name
+    }
+
+    return result
+
+def run_thermal_modules():
+
+    temperature = Fever.Fever_start(cap1)
+    breath_count = SOB.SOB_run(cap0, cap1)
+
+    result = {
+        'temperature': temperature,
+        'breath_count': breath_count
+    }
+    return result
+
+def release_caps():
+    print('Caps released -------------------------------------------------------------------')
+
+# run_thermal_modules()
