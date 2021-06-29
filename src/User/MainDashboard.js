@@ -3,6 +3,10 @@ import "../assets/scss/black-dashboard-react.scss";
 import "../assets/css/nucleo-icons.css";
 import React,{Component} from "react";
 import FlipCard from "./flipCard";
+import audio from './../sound/welcome.wav';
+import anosmia01 from './../sound/anosmia01.wav';
+import anosmia02 from './../sound/anosmia02.wav';
+import ask_to_cough from './../sound/ask_to_cough.wav';
 import {
     Button,
     ButtonGroup,
@@ -33,14 +37,177 @@ class MainDashboard extends Component {
         super(props);
 
         this.state={
-
+            anosmia_classifier_value:'',
+            anosmia_status : '',
+            recordingStatus:'',
+            predictLabel :'',
+            predictPercentage : 0,
+            coughLoaded:false
         }
+        this.soundCommand = this.soundCommand.bind(this)
+        this.AnosmiaGetData = this.AnosmiaGetData.bind(this)
+        this.PlayCoughSaying = this.PlayCoughSaying.bind(this)
+        this.PREDICTION = this.PREDICTION.bind(this)
+        this.AnosmiaGetData = this.AnosmiaGetData.bind(this)
+        this.CoughRecording = this.CoughRecording.bind(this)
+        this.PlayCoughSaying = this.PlayCoughSaying.bind(this)
+        this.soundCommand = this.soundCommand.bind(this)
+        this.playAudio = this.playAudio.bind(this)
 
     }
+
+    componentDidMount() {
+        const audioEl = document.getElementsByClassName("audio-element")[0]
+        audioEl.play()
+        this.soundCommand()
+
+    }
+
+    soundCommand(){
+         setTimeout(this.AnosmiaGetData,8000);
+         setTimeout(this.PlayCoughSaying,24000);
+
+    }
+
+      playAudio() {
+        const audioPromise = this.audio.play()
+        if (audioPromise !== undefined) {
+          audioPromise
+            .then(_ => {
+              // autoplay started
+            })
+            .catch(err => {
+              // catch dom exception
+              console.info(err)
+            })
+        }
+    }
+
+    AnosmiaGetData(){
+        console.log('aawa')
+        this.audio = new Audio(anosmia01)
+        this.audio.load()
+        this.playAudio()
+        setTimeout(fetch('/anosmia', {
+            method: 'GET',
+            // body: JSON.stringify(payload),
+        }).then((response) => {
+            response.json().then((body) => {
+                console.log(response)
+                if (body.classifier_value == ''){
+                    this.soundCommand()
+                }
+                else {
+
+                    this.setState({
+                        anosmia_classifier_value: body.classifier_value,
+
+
+                    })
+
+
+                if(body.classifier_value == 'yes'){
+                    setTimeout(this.getAnosmiaFragrance(),2000)
+                }
+                else{
+                    if(parseFloat(body.arduino_value) > 1500 ){
+                        this.setState({
+                            anosmia_status:'Anosmia'
+                        })
+                    }
+                    else{
+                         this.setState({
+                            anosmia_status:'Normal'
+                        })
+                    }
+                }
+
+            }});
+
+        }),1200)
+    }
+
+    getAnosmiaFragrance(){
+        this.audio = new Audio(anosmia02)
+        this.audio.load()
+        this.playAudio()
+
+        // console.log(JSON.stringify(sendData))
+        fetch('/anosmiaFrag', {
+            method: 'POST',
+            // body: JSON.stringify(sendData),
+        }).then((response) => {
+            response.json().then((body) => {
+                console.log(response)
+                this.setState({
+                    anosmia_status : body.status,
+                    // predictPercentage : body.percentage,
+                })
+
+            });
+        });
+    }
+    PlayCoughSaying(){
+        this.audio = new Audio(ask_to_cough)
+        this.audio.load()
+        this.playAudio()
+        let value = '';
+        setTimeout(this.CoughRecording,4200);
+        //
+        //
+
+    }
+
+    CoughRecording(){
+         fetch('/recordCough', {
+            method: 'GET',
+            // body: JSON.stringify(payload),
+        }).then((response) => {
+            response.json().then((body) => {
+                console.log(body)
+                this.setState({
+                    recordingStatus:body,
+                    coughLoaded:true
+                })
+                // if(response == 'created'){
+
+                //     setTimeout(this.PREDICTION,8000)
+                // }
+
+
+            });
+        });
+         setTimeout(this.PREDICTION,10000)
+
+    }
+
+    PREDICTION(){
+        let value = '';
+        fetch('/predictCough', {
+            method: 'GET',
+            // body: JSON.stringify(payload),
+        }).then((response) => {
+            response.json().then((body) => {
+                console.log(response)
+                this.setState({
+                    predictLabel : body.prediction_label,
+                    predictPercentage : parseFloat(body.percentage) * 100 +" %"  ,
+
+                })
+
+            });
+        });
+    }
+
     render() {
         return (
             <div className="App">
                 <Row>
+                     <div>
+                            <audio className="audio-element">
+                              <source src={audio}></source>
+                            </audio>
+                        </div>
                     <Col xs="12">
                         <Card className="card-chart">
                             <CardHeader>
@@ -76,13 +243,20 @@ class MainDashboard extends Component {
 
                             <CardBody>
                                 <Row style={{marginLeft: "8%", marginTop: "5%"}}>
+
                                     <Col lg="2.9">
+
                                         <FlipCard componentName="Smell Level" currentStatus="Yet to Begin"
-                                                  componentValue="Normal"/>
+                                                  componentValue="Normal" flipped={false}/>
                                     </Col>
                                     <Col lg="2.9">
+                                        {this.state.coughLoaded?
                                         <FlipCard componentName="Cough" currentStatus="Yet to Begin"
-                                                  componentValue="Normal"/>
+                                                  componentValue="Normal" flipped={true}/>:
+                                            <FlipCard componentName="Cough" currentStatus="Yet to Begin"
+                                                  componentValue="Normal" flipped={false}/>
+                                        }
+
                                     </Col>
                                     <Col lg="2.9">
                                         <FlipCard componentName="Breathing Count" currentStatus="Yet to Begin"

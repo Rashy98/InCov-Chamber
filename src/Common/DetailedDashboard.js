@@ -41,6 +41,8 @@ export default class DetailedDashboard extends PureComponent {
             anosmia_status : '',
             employees :[],
             breath_count:0,
+            // employees :[],
+            recordingStatus:'',
             temperature: 0,
             emp_name: ''
         }
@@ -111,7 +113,6 @@ export default class DetailedDashboard extends PureComponent {
         this.audio.load()
         this.playAudio()
         let value = '';
-
         setTimeout(this.CoughRecording,4200);
         //
         //
@@ -124,11 +125,19 @@ export default class DetailedDashboard extends PureComponent {
             // body: JSON.stringify(payload),
         }).then((response) => {
             response.json().then((body) => {
-                console.log(response)
+                console.log(body)
+                this.setState({
+                    recordingStatus:body
+                })
+                // if(response == 'created'){
+
+                //     setTimeout(this.PREDICTION,8000)
+                // }
+
+
             });
         });
          setTimeout(this.PREDICTION,8000)
-
 
     }
 

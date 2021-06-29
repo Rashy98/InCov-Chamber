@@ -7,6 +7,7 @@ import FavoriteIcon from "@material-ui/icons/Favorite";
 import DateRange from "@material-ui/icons/DateRange";
 // import Photo from "../assets/Images/0KSi2atlmsXNcGMfpDNzIjJSvC23.png";
 import {Button} from "react-bootstrap";
+import axios from "axios";
 
 export default class Dashboard extends Component {
 
@@ -14,15 +15,12 @@ export default class Dashboard extends Component {
         super(props);
         this.state={
             placeholder :'hi',
+            employees:[]
         }
 
         this.getHello = this.getHello.bind(this);
 
     }
-
-
-
-
 
 
     getHello(){
@@ -37,8 +35,19 @@ export default class Dashboard extends Component {
 
     }
 
+    getEmployees(){
+          axios.get('http://localhost:8000/employee/')
+            .then(res => {
+                console.log(res.data[0])
+                this.setState({
+                    employees: res.data[0]
+                })
+            })
+    }
+
     componentDidMount() {
         this.getHello();
+        this.getEmployees();
     }
 
     render() {

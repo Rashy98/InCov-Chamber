@@ -10,9 +10,11 @@ render() {
     return (
         <Flippy
         flipOnHover={false} // default false
-        flipOnClick={true} // default false
+        flipOnClick={false}
+        isFlipped={this.props.flipped}// default false
         flipDirection="horizontal" // horizontal or vertical
-        ref={(r) => this.flippy = r} // to use toggle method like this.flippy.toggle()
+        ref={(r) => this.flippy = r}
+        // to use toggle method like this.flippy.toggle()
         // if you pass isFlipped prop component will be controlled component.
         // and other props, which will go to div
         style={{ width: '20em', height: '20em' }} /// these are optional style, it is not necessary
