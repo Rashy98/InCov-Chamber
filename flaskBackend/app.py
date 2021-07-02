@@ -47,11 +47,19 @@ def anosmiaFrag():
 
 @app.route("/anosmia", methods=["GET","POST"])
 def anosmia():
-    return jsonify(anosmia_run.anosmiaChecker())
+    return jsonify(anosmia_run.recordSound())
 
 @app.route("/thermal_module", methods=["GET"])
 def sob():
     return jsonify(camera_module_run.run_thermal_modules())
+
+@app.route("/get_temperature", methods=["GET"])
+def temperature():
+    return jsonify(camera_module_run.get_temperature())
+
+@app.route("/get_breath_count", methods=["GET"])
+def breath_count():
+    return jsonify(camera_module_run.get_breath_count())
 
 @app.route("/face_auth", methods=["GET"])
 def face_auth():

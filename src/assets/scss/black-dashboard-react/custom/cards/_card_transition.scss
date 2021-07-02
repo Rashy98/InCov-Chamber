@@ -1,0 +1,20 @@
+.move-me {
+  display: inline-block;
+  padding: 20px;
+  color: white;
+  position: relative;
+  margin: 0 0 10px 0px;
+}
+
+.move-me-3 {
+  animation: move-in-steps 2s;
+}
+
+@keyframes move-in-steps {
+  0% {
+    left: 0;
+  }
+  100% {
+    left: 50%;
+  }
+}

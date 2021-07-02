@@ -44,7 +44,7 @@ class LandingApp extends Component {
 
         return (
             <div className="App" style={{position: 'relative', overflow: "hidden"}}>
-                <div style={{position: 'absolute', minWidth: "1500px", Height: "2000vh"}}>
+                <div style={{position: 'absolute', minWidth: "100%", Height: "100%"}}>
                     <ParticleBackground/>
 
                 </div>

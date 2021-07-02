@@ -20,7 +20,7 @@ def anosmiaFragChecker():
     dataFrag = pd.read_csv('./Anosmia/fragrance_type_classifier/smellNameList.txt', delimiter=",")
     modelFrag = pickle.load(open('./Anosmia/fragrance_type_classifier/finalized_FragranceNameClassifer_model.pkl', 'rb'))
 
-    text = voice_to_text.voiceText()
+    text = voice_to_text.Frag()
     print(text)
 
     classifierFragValue =''

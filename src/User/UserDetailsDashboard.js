@@ -1,11 +1,12 @@
 import '../App.css';
 import "../assets/scss/black-dashboard-react.scss";
 import "../assets/css/nucleo-icons.css";
-import ReactCardFlip from "react-card-flip";
-import ReactDOM from "react-dom";
+// import ReactCardFlip from "react-card-flip";
+// import ReactDOM from "react-dom";
 import React, {useState,Component} from "react";
 import Loader from "react-loader-spinner";
 import {Redirect} from "react-router-dom";
+import logo from "../assets/Images/logo.png"
 
 
 
@@ -50,7 +51,8 @@ class UserDetailsDashboard extends Component {
             name:"",
             position:"",
             photo:"",
-            redirect:false,
+            redirect: false,
+            imgLoaded: false
         }
         this.timeOutFn = this.timeOutFn.bind(this);
     }
@@ -81,7 +83,8 @@ class UserDetailsDashboard extends Component {
                     name:res.data.result.fullName,
                     position:res.data.result.position,
                     photo:res.data.result.photo,
-                    isLoading:false
+                    isLoading:false,
+                    imgLoaded: true
                 })
         });
 
@@ -113,11 +116,20 @@ class UserDetailsDashboard extends Component {
                                                     <div className="block block-three"/>
                                                     <div className="block block-four"/>
                                                     <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                                                        <img
-                                                            alt="..."
-                                                            className="avatar"
-                                                            src={`data:image/jpeg;base64,${this.state.photo}`}
-                                                        />
+                                                        {
+                                                            this.state.imgLoaded?
+                                                                <img
+                                                                    className="avatar"
+                                                                    src={`data:image/jpeg;base64,${this.state.photo}`}
+                                                                />
+                                                                :
+                                                                <img
+                                                                    className="avatar"
+                                                                    src={logo}
+                                                                />
+                                                        }
+
+
 
                                                         <h2 className="title">{this.state.name}</h2>
                                                     </a>
