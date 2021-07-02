@@ -1,4 +1,3 @@
-
 import '../App.css';
 import ParticleBackground from "../User/LandingPage";
 import logos from '../assets/Images/logo.png';
@@ -43,7 +42,7 @@ class LandingApp extends Component {
     render() {
 
         return (
-            <div className="App" style={{position: 'relative', overflow: "hidden"}}>
+            <div className="card-user" style={{position: 'relative', overflow: "hidden"}}>
                 <div style={{position: 'absolute', minWidth: "100%", Height: "100%"}}>
                     <ParticleBackground/>
 
