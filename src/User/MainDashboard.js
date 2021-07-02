@@ -76,7 +76,10 @@ class MainDashboard extends Component {
         this.soundCommand()
         // this.thermal_module()
         this.get_temperature()
-        this.get_breath_count()
+        setTimeout(function (){
+            this.get_breath_count()
+        }.bind(this), 2000)
+
     }
 
     soundCommand() {
@@ -221,8 +224,7 @@ class MainDashboard extends Component {
         }).then((response) => {
             response.json().then((body) => {
                 this.setState({
-                    temperature: body.temperature,
-                    temperatureLoaded: true
+                    temperature: body.temperature
                 })
             })
         })
@@ -234,8 +236,7 @@ class MainDashboard extends Component {
         }).then((response) => {
             response.json().then((body) => {
                 this.setState({
-                    breath_count: body.breath_count * 2,
-                    breathCountLoaded: true
+                    breath_count: body.breath_count * 2
                 })
             })
         })
@@ -254,8 +255,9 @@ class MainDashboard extends Component {
                     coughLoaded: true,
                 })
 
-                this.setDisplayState("coughDisplayed", 3000)
-                this.setDisplayState("breathCountDisplayed", 6000)
+                this.setDisplayState("coughDisplayed", "breathCountLoaded", 2000, 4000)
+                this.setDisplayState("breathCountDisplayed", "temperatureLoaded", 6000, 8000)
+
             });
         });
     }
@@ -279,12 +281,21 @@ class MainDashboard extends Component {
 
     }
 
-    setDisplayState(state, timeOut) {
-        setTimeout(
-            this.setState({
-                [state]: true
-            }),
-            timeOut
+    setDisplayState(state1, state2, timeOut1, timeOut2) {
+        setTimeout(function () {
+                this.setState({
+                    [state1]: true
+                })
+            }.bind(this),
+            timeOut1
+        )
+
+        setTimeout(function () {
+                this.setState({
+                    [state2]: true
+                })
+            }.bind(this),
+            timeOut2
         )
     }
 
@@ -326,7 +337,7 @@ class MainDashboard extends Component {
 
                                         </Card>
                                     </Col>
-                                    <Col sm={8} style={{marginTop: '2%'}}>
+                                    <Col sm={8} style={{marginTop: '5%'}}>
                                         {/*<Row style={{ width: '90%', height: '10%', marginLeft:"5%" }}>*/}
                                         <Col lg="2.9">
                                             <motion.div
