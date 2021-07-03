@@ -58,7 +58,7 @@ class MainDashboard extends Component {
         this.soundCommand = this.soundCommand.bind(this)
         this.AnosmiaGetData = this.AnosmiaGetData.bind(this)
         this.PlayCoughSaying = this.PlayCoughSaying.bind(this)
-        this.PREDICTION = this.PREDICTION.bind(this)
+        this.getCoughPrediction = this.getCoughPrediction.bind(this)
         this.AnosmiaGetData = this.AnosmiaGetData.bind(this)
         this.CoughRecording = this.CoughRecording.bind(this)
         this.soundCommand = this.soundCommand.bind(this)
@@ -74,11 +74,11 @@ class MainDashboard extends Component {
         const audioEl = document.getElementsByClassName("audio-element")[0]
         audioEl.play()
         this.soundCommand()
-        // this.thermal_module()
-        this.get_temperature()
-        setTimeout(function (){
-            this.get_breath_count()
-        }.bind(this), 2000)
+        this.thermal_module()
+        // this.get_temperature()
+        // setTimeout(function (){
+        //     this.get_breath_count()
+        // }.bind(this), 2000)
 
     }
 
@@ -102,17 +102,15 @@ class MainDashboard extends Component {
     }
 
     AnosmiaGetData() {
-        // console.log('aawa')
         this.audio = new Audio(anosmia01)
         this.audio.load()
         this.playAudio()
 
         setTimeout(fetch('/anosmia', {
             method: 'GET',
-            // body: JSON.stringify(payload),
         }).then((response) => {
             response.json().then((body) => {
-                console.log(response)
+
                 if (body.classifier_value === '') {
                     this.soundCommand()
                 } else {
@@ -128,9 +126,11 @@ class MainDashboard extends Component {
                         setTimeout(this.getAnosmiaFragrance(), 2000)
                     } else {
 
-                        if (parseFloat(body.arduino_value) > 1500) {
+                        var arduino_val = body.arduino_value
+
+                        if (arduino_val > 1500) {
                             this.setState({
-                                anosmia_status: 'Anosmia'
+                                anosmia_status: 'Unusual'
                             })
                         } else {
                             this.setState({
@@ -153,16 +153,20 @@ class MainDashboard extends Component {
         this.audio.load()
         this.playAudio()
 
-        // console.log(JSON.stringify(sendData))
         fetch('/anosmiaFrag', {
             method: 'POST',
-            // body: JSON.stringify(sendData),
         }).then((response) => {
             response.json().then((body) => {
-                console.log(response)
+                var status = ''
+
+                if(body.status === 'LIAR'){
+                    status = "Unusual"
+                } else {
+                    status = "Normal"
+                }
+
                 this.setState({
-                    anosmia_status: body.status,
-                    // predictPercentage : body.percentage,
+                    anosmia_status: status,
                 })
                 this.PlayCoughSaying()
             });
@@ -200,7 +204,7 @@ class MainDashboard extends Component {
 
             });
         });
-        setTimeout(this.PREDICTION, 8000)
+        setTimeout(this.getCoughPrediction, 8000)
 
     }
 
@@ -209,9 +213,19 @@ class MainDashboard extends Component {
             method: 'GET'
         }).then((response) => {
             response.json().then((body) => {
+
+                var breathStatus = ''
+                var breathCount = body.breath_count * 2
+
+                if (12 <= breathCount && breathCount <= 18){
+                    breathStatus = 'Normal'
+                } else {
+                    breathStatus = 'Unusual'
+                }
+
                 this.setState({
-                    temperature: body.temperature,
-                    breath_count: body.breath_count * 2,
+                    temperature: body.temperature + "\u00b0 C",
+                    breath_count: breathStatus,
                     thermalModuleLoaded: true
                 })
             })
@@ -224,7 +238,7 @@ class MainDashboard extends Component {
         }).then((response) => {
             response.json().then((body) => {
                 this.setState({
-                    temperature: body.temperature
+                    temperature: body.temperature + "\u00b0 C"
                 })
             })
         })
@@ -235,22 +249,40 @@ class MainDashboard extends Component {
             method: 'GET'
         }).then((response) => {
             response.json().then((body) => {
+
+                var breathStatus = ''
+
+                if (12 <= (body.breath_count * 2) <= 18){
+                    breathStatus = 'Normal'
+                } else {
+                    breathStatus = 'Unusual'
+                }
+
                 this.setState({
-                    breath_count: body.breath_count * 2
+                    breath_count: breathStatus
                 })
             })
         })
     }
 
-    PREDICTION() {
+    getCoughPrediction() {
         let value = '';
         fetch('/predictCough', {
             method: 'GET',
-            // body: JSON.stringify(payload),
+
         }).then((response) => {
             response.json().then((body) => {
+
+                var predictLabel = ''
+
+                if (body.prediction_label === 'healthy'){
+                    predictLabel = 'Normal'
+                } else {
+                    predictLabel = 'Unusual'
+                }
+
                 this.setState({
-                    predictLabel: body.prediction_label,
+                    predictLabel: predictLabel,
                     predictPercentage: parseFloat(body.percentage) * 100 + " %",
                     coughLoaded: true,
                 })
@@ -346,7 +378,7 @@ class MainDashboard extends Component {
                                                 // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(true, this.state.anosmiaLoaded, "Smell Level", "Normal")}
+                                                {this.displayFlipCard(true, this.state.anosmiaLoaded, "Smell Level", this.state.anosmia_status)}
                                                 {/*{this.state.anosmiaLoaded ?*/}
 
                                                 {/*    <FlipCard componentName="Smell Level" currentStatus="Yet to Begin"*/}
@@ -367,7 +399,7 @@ class MainDashboard extends Component {
                                                 // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(this.state.anosmiaDisplayed, this.state.coughLoaded, "Cough", "Normal")}
+                                                {this.displayFlipCard(this.state.anosmiaDisplayed, this.state.coughLoaded, "Cough", this.state.predictLabel)}
                                                 {/*{this.state.anosmiaDisplayed ?*/}
                                                 {/*    <div>*/}
                                                 {/*        /!*{this.state.coughLoaded ?*!/*/}

@@ -43,8 +43,6 @@ def anosmiaFrag():
 
     return jsonify(anosmia_fragrance_classifier_run.anosmiaFragChecker())
 
-
-
 @app.route("/anosmia", methods=["GET","POST"])
 def anosmia():
     return jsonify(anosmia_run.recordSound())

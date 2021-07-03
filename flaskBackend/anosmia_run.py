@@ -55,7 +55,7 @@ def anosmiaChecker(text):
 
     Anosmia_response = {
         'classifier_value':classifierValue,
-        # 'arduino_value':float(arduinoValue),
+        'arduino_value':float(arduinoValue)
       }
     return Anosmia_response
 def recordSound():
