@@ -3,13 +3,10 @@ import "../assets/scss/black-dashboard-react.scss";
 import "../assets/css/nucleo-icons.css";
 // import ReactCardFlip from "react-card-flip";
 // import ReactDOM from "react-dom";
-import React, {useState,Component} from "react";
+import React, {useState, Component} from "react";
 import Loader from "react-loader-spinner";
 import {Redirect} from "react-router-dom";
 import logo from "../assets/Images/logo.png"
-import back from "../assets/Images/back.png"
-
-
 
 
 //import "./assets/"
@@ -42,20 +39,19 @@ import axios from "axios";
 import * as url from "url";
 
 
-
 class FinalPage extends Component {
 
 
-    constructor(props){
+    constructor(props) {
         super(props);
 
 
-        this.state={
-            employees:[],
-            isLoading:true,
-            name:"",
-            position:"",
-            photo:"",
+        this.state = {
+            employees: [],
+            isLoading: true,
+            name: "",
+            position: "",
+            photo: "",
             redirect: false,
             imgLoaded: false
         }
@@ -67,13 +63,15 @@ class FinalPage extends Component {
         // this.getEmployees();
     }
 
-    timeOutFn(emp){
-        setTimeout( ()=>{this.setState({
-            redirect:true
-        })
+    timeOutFn(emp) {
+        setTimeout(() => {
+            this.setState({
+                redirect: true
+            })
 
         }, 5000)
     }
+
     // getEmployees(){
     //     axios({
     //           method: 'post',
@@ -98,26 +96,16 @@ class FinalPage extends Component {
     // }
 
 
-
-
-
-
-
     render() {
-
         return (
             <div className="App">
-
                 <Row>
                     <Col xl="12">
-
-                        <Card className="mt-lg">
-
+                        <Card style={{marginTop: "2.5%"}}>
                             <CardHeader>
-
                                 <Row>
                                     <Col md="">
-                                        <Card className="card-two" >
+                                        <Card className="card-two">
                                             <CardBody>
                                                 <CardText/>
                                                 <div className="author">
@@ -126,21 +114,23 @@ class FinalPage extends Component {
                                                     {/*<div className="block block-three"/>*/}
                                                     {/*<div className="block block-four"/>*/}
                                                     <a href="#pablo" onClick={(e) => e.preventDefault()}>
-
-                                                                <img
-                                                                    className="avatar"
-                                                                    src={logo}
-                                                                />
-
-
-
-                                                    {/*    <h2 className="title">{this.state.name}</h2>*/}
+                                                        <img
+                                                            className="avatar"
+                                                            src={logo}
+                                                        />
+                                                        {/*    <h2 className="title">{this.state.name}</h2>*/}
                                                     </a>
                                                     {/*<h4 className="description">{this.state.position}</h4>*/}
                                                 </div>
+                                                <h1 style={{color: "black"}}>Thank You!</h1>
                                                 <br/>
-                                                <h2 className="" style={{color:'black'}}>Chamber will Automatically Begin the
-                                                    Process..</h2>
+                                                {this.props.location.state.isSafe ?
+                                                    <h2 className="" style={{color: 'black'}}>You may leave
+                                                        the chamber</h2>
+                                                    :
+                                                    <h2 className="" style={{color: 'black'}}>Please wait
+                                                        outside the chamber </h2>
+                                                }
                                                 {/*<Loader*/}
                                                 {/*    type="Puff"*/}
                                                 {/*    color="#00BFFF"*/}
@@ -168,12 +158,7 @@ class FinalPage extends Component {
 
                                                 {/*    </div>*/}
                                                 {/*}*/}
-
-
-
-
                                             </CardBody>
-
                                         </Card>
                                     </Col>
                                 </Row>

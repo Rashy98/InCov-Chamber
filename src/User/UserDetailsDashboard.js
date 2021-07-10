@@ -90,20 +90,13 @@ class UserDetailsDashboard extends Component {
 
 
     }
-
-
-
-
-
-
-
     render() {
 
         return (
             <div className="App">
                 <Row>
                     <Col xl="12">
-                        <Card className="mt-lg">
+                        <Card style={{marginTop: "2.5%"}}>
                             <CardHeader>
                                 <Row>
                                     <Col md="">
@@ -137,7 +130,7 @@ class UserDetailsDashboard extends Component {
                                                 </div>
                                                 <br/>
                                                 <h2 className="description">Chamber will Automatically Begin the
-                                                    Process..</h2>
+                                                    Tests..</h2>
                                                 <Loader
                                                     type="Puff"
                                                     color="#00BFFF"

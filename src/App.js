@@ -18,8 +18,7 @@ function App() {
                 <Route  path='/detailed' exact component={DetailedDashboard}/>
                 <Route path='/UserDetailsDashboard' exact component={UserDetailsDashboard}/>
                 <Route path='/MainDashboard' exact component={MainDashboard}/>
-
-
+                <Route path='/FinalPage' exact component={FinalPage}/>
             </switch>
         </Router>
     );

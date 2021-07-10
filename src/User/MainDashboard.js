@@ -1,13 +1,20 @@
-import '../App.css';
-import "../assets/scss/black-dashboard-react.scss";
-import "../assets/css/nucleo-icons.css";
 import React, {Component} from "react";
 import FlipCard from "./flipCard";
-import audio from './../sound/welcome.wav';
+import {AnimatePresence, motion} from 'framer-motion';
+
+import welcome_audio from './../sound/welcome.wav';
 import anosmia01 from './../sound/anosmia01.wav';
 import anosmia02 from './../sound/anosmia02.wav';
 import ask_to_cough from './../sound/ask_to_cough.wav';
-import {AnimatePresence, motion} from 'framer-motion';
+import thank_you_audio from './../sound/ThankYou.wav'
+import cough_audio from './../sound/Cough.wav'
+import no_cough_audio from './../sound/NonCough.wav'
+
+import '../App.css';
+import "../assets/scss/black-dashboard-react.scss";
+import "../assets/css/nucleo-icons.css";
+import Logo from "../assets/Images/logo3.png"
+
 import {
     Button,
     ButtonGroup,
@@ -31,6 +38,7 @@ import {
     Form,
     UncontrolledTooltip,
 } from "reactstrap";
+import {Redirect, withRouter} from "react-router-dom";
 
 
 class MainDashboard extends Component {
@@ -39,21 +47,26 @@ class MainDashboard extends Component {
 
         this.state = {
             anosmia_classifier_value: '',
-            anosmia_status: '',
             recordingStatus: '',
-            predictLabel: '',
             predictPercentage: 0,
-            temperature: 0,
-            breath_count: 0,
+
+            anosmiaStatus: '',
+            coughStatus: '',
+            temperatureStatus: 0,
+            breathStatus: 0,
+
             thermalModuleLoaded: false,
-            temperatureLoaded: false,
+            temperatureStatusLoaded: false,
             breathCountLoaded: false,
             coughLoaded: false,
             anosmiaLoaded: false,
+
             anosmiaDisplayed: false,
             coughDisplayed: false,
             breathCountDisplayed: false,
-            temperatureDisplayed: false
+            temperatureStatusDisplayed: false,
+
+            isSafe: false
         }
         this.soundCommand = this.soundCommand.bind(this)
         this.AnosmiaGetData = this.AnosmiaGetData.bind(this)
@@ -64,27 +77,68 @@ class MainDashboard extends Component {
         this.soundCommand = this.soundCommand.bind(this)
         this.playAudio = this.playAudio.bind(this)
         this.thermal_module = this.thermal_module.bind(this)
-        this.get_temperature = this.get_temperature.bind(this)
-        this.get_breath_count = this.get_breath_count.bind(this)
+        this.get_temperatureStatus = this.get_temperatureStatus.bind(this)
+        this.get_breathStatus = this.get_breathStatus.bind(this)
         this.displayFlipCard = this.displayFlipCard.bind(this)
         this.setDisplayState = this.setDisplayState.bind(this)
+        this.handleAudio = this.handleAudio.bind(this)
     }
 
-    componentDidMount() {
-        const audioEl = document.getElementsByClassName("audio-element")[0]
-        audioEl.play()
+    async componentDidMount() {
+
+        await this.handleAudio(welcome_audio)
         this.soundCommand()
         this.thermal_module()
-        // this.get_temperature()
+
+        // this.audio = new Audio(welcome_audio)
+        // this.audio.load()
+        // this.playAudio()
+        // const audioEl = document.getElementsByClassName("audio-element")[0]
+        // audioEl.play()
+        // this.get_temperatureStatus()
         // setTimeout(function (){
-        //     this.get_breath_count()
+        //     this.get_breathStatus()
         // }.bind(this), 2000)
 
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevState.temperatureStatusDisplayed !== this.state.temperatureStatusDisplayed) {
+
+            // var _isSafe = false
+
+            if ((this.state.anosmiaStatus === "Normal") &&
+                (this.state.coughStatus === "Normal") &&
+                (parseFloat(this.state.temperatureStatus) <= 38) &&
+                (this.state.breathStatus === "Normal")) {
+                // _isSafe = true
+                this.props.history.push({
+                    pathname: '/FinalPage',
+                    state: {isSafe: true}
+                })
+            } else {
+                this.props.history.push({
+                    pathname: '/FinalPage',
+                    state: {isSafe: false}
+                })
+            }
+
+            // this.props.history.push({
+            //     pathname: '/FinalPage',
+            //     state: {isSafe: _isSafe}
+            // })
+        }
+    }
+
     soundCommand() {
-        setTimeout(this.AnosmiaGetData, 10000);
+        setTimeout(this.AnosmiaGetData, 8000);
         // setTimeout(this.PlayCoughSaying, 20000);
+    }
+
+    async handleAudio(audio) {
+        this.audio = new Audio(audio)
+        this.audio.load()
+        this.playAudio()
     }
 
     playAudio() {
@@ -101,10 +155,12 @@ class MainDashboard extends Component {
         }
     }
 
-    AnosmiaGetData() {
-        this.audio = new Audio(anosmia01)
-        this.audio.load()
-        this.playAudio()
+    async AnosmiaGetData() {
+        await this.handleAudio(anosmia01)
+
+        // this.audio = new Audio(anosmia01)
+        // this.audio.load()
+        // this.playAudio()
 
         setTimeout(fetch('/anosmia', {
             method: 'GET',
@@ -117,27 +173,32 @@ class MainDashboard extends Component {
 
                     this.setState({
                         anosmia_classifier_value: body.classifier_value,
-                        anosmiaLoaded: true,
-                        anosmiaDisplayed: true
                     })
 
 
                     if (body.classifier_value === 'yes') {
-                        setTimeout(this.getAnosmiaFragrance(), 2000)
+                        // setTimeout(this.getAnosmiaFragrance(), 2000)
+                        this.getAnosmiaFragrance()
                     } else {
 
                         var arduino_val = body.arduino_value
 
                         if (arduino_val > 1500) {
                             this.setState({
-                                anosmia_status: 'Unusual'
+                                anosmiaStatus: 'Unusual'
                             })
                         } else {
                             this.setState({
-                                anosmia_status: 'Normal'
+                                anosmiaStatus: 'Normal'
                             })
                         }
-                        this.PlayCoughSaying()
+
+                        this.setState({
+                            anosmiaLoaded: true,
+                            anosmiaDisplayed: true
+                        })
+
+                        this.PlayCoughSaying('init')
                     }
 
                 }
@@ -149,9 +210,10 @@ class MainDashboard extends Component {
     }
 
     getAnosmiaFragrance() {
-        this.audio = new Audio(anosmia02)
-        this.audio.load()
-        this.playAudio()
+        this.handleAudio(anosmia02)
+        // this.audio = new Audio(anosmia02)
+        // this.audio.load()
+        // this.playAudio()
 
         fetch('/anosmiaFrag', {
             method: 'POST',
@@ -159,53 +221,53 @@ class MainDashboard extends Component {
             response.json().then((body) => {
                 var status = ''
 
-                if(body.status === 'LIAR'){
+                if (body.status === 'LIAR') {
                     status = "Unusual"
                 } else {
                     status = "Normal"
                 }
 
                 this.setState({
-                    anosmia_status: status,
+                    anosmiaStatus: status,
+                    anosmiaLoaded: true,
+                    anosmiaDisplayed: true
                 })
-                this.PlayCoughSaying()
+
+                this.PlayCoughSaying('init')
             });
         });
     }
 
-    PlayCoughSaying() {
-        this.audio = new Audio(ask_to_cough)
-        this.audio.load()
-        this.playAudio()
-        let value = '';
+    PlayCoughSaying(position) {
+        console.log('hfuvid')
+        if (position === 'init') {
+            this.handleAudio(ask_to_cough)
+            // this.audio = new Audio(ask_to_cough)
+            // this.audio.load()
+            // this.playAudio()
+        } else {
+            this.handleAudio(no_cough_audio)
+            // this.audio = new Audio(no_cough_audio)
+            // this.audio.load()
+            // this.playAudio()
+        }
 
         setTimeout(this.CoughRecording, 4200);
-        //
-        //
-
     }
 
     CoughRecording() {
         fetch('/recordCough', {
             method: 'GET',
-            // body: JSON.stringify(payload),
         }).then((response) => {
             response.json().then((body) => {
                 console.log(body)
                 this.setState({
-                    recordingStatus: body,
-
+                    recordingStatus: body
                 })
-                // if(response == 'created'){
-
-                //     setTimeout(this.PREDICTION,8000)
-                // }
-
-
             });
         });
-        setTimeout(this.getCoughPrediction, 8000)
 
+        setTimeout(this.getCoughPrediction, 8000)
     }
 
     thermal_module() {
@@ -216,51 +278,52 @@ class MainDashboard extends Component {
 
                 var breathStatus = ''
                 var breathCount = body.breath_count * 2
+                var temperatureStatus = body.temperature
 
-                if (12 <= breathCount && breathCount <= 18){
+                if (12 <= breathCount && breathCount <= 20) {
                     breathStatus = 'Normal'
                 } else {
                     breathStatus = 'Unusual'
                 }
 
                 this.setState({
-                    temperature: body.temperature + "\u00b0 C",
-                    breath_count: breathStatus,
+                    temperatureStatus: temperatureStatus + "\u00b0 C",
+                    breathStatus: breathStatus,
                     thermalModuleLoaded: true
                 })
             })
         })
     }
 
-    get_temperature() {
-        fetch('get_temperature', {
+    get_temperatureStatus() {
+        fetch('get_temperatureStatus', {
             method: 'GET'
         }).then((response) => {
             response.json().then((body) => {
                 this.setState({
-                    temperature: body.temperature + "\u00b0 C"
+                    temperatureStatus: body.temperatureStatus + "\u00b0 C"
                 })
             })
         })
     }
 
-    get_breath_count() {
-        fetch('get_breath_count', {
+    get_breathStatus() {
+        fetch('get_breathStatus', {
             method: 'GET'
         }).then((response) => {
             response.json().then((body) => {
 
                 var breathStatus = ''
 
-                if (12 <= (body.breath_count * 2) <= 18){
+                if (12 <= (body.breathStatus * 2) <= 18) {
                     breathStatus = 'Normal'
                 } else {
                     breathStatus = 'Unusual'
                 }
 
-                this.setState({
-                    breath_count: breathStatus
-                })
+                // this.setState({
+                //     breathStatus: breathStatus
+                // })
             })
         })
     }
@@ -273,22 +336,26 @@ class MainDashboard extends Component {
         }).then((response) => {
             response.json().then((body) => {
 
-                var predictLabel = ''
+                var coughStatus = ''
 
-                if (body.prediction_label === 'healthy'){
-                    predictLabel = 'Normal'
+                if (body.prediction_label === 'healthy') {
+                    coughStatus = 'Normal'
+                } else if (body.prediction_label === 'no cough') {
+                    this.PlayCoughSaying('no_cough')
+                    return
                 } else {
-                    predictLabel = 'Unusual'
+                    coughStatus = 'Unusual'
                 }
 
                 this.setState({
-                    predictLabel: predictLabel,
+                    coughStatus: coughStatus,
                     predictPercentage: parseFloat(body.percentage) * 100 + " %",
-                    coughLoaded: true,
+                    coughLoaded: true
                 })
 
-                this.setDisplayState("coughDisplayed", "breathCountLoaded", 2000, 4000)
-                this.setDisplayState("breathCountDisplayed", "temperatureLoaded", 6000, 8000)
+                this.setDisplayState("coughDisplayed", "breathCountLoaded", 4000, 6000)
+                this.setDisplayState("breathCountDisplayed", "temperatureStatusLoaded", 8000, 10000)
+                this.setDisplayState("temperatureStatusDisplayed", null, 12000, null)
 
             });
         });
@@ -322,24 +389,27 @@ class MainDashboard extends Component {
             timeOut1
         )
 
-        setTimeout(function () {
-                this.setState({
-                    [state2]: true
-                })
-            }.bind(this),
-            timeOut2
-        )
+        if (state2 !== null) {
+            setTimeout(function () {
+                    this.setState({
+                        [state2]: true
+                    })
+                }.bind(this),
+                timeOut2
+            )
+        }
+
     }
 
     render() {
         return (
             <div className="App">
                 <Row>
-                    <div>
-                        <audio className="audio-element">
-                            <source src={audio}></source>
-                        </audio>
-                    </div>
+                    {/*<div>*/}
+                    {/*    <audio className="audio-element">*/}
+                    {/*        <source src={audio}></source>*/}
+                    {/*    </audio>*/}
+                    {/*</div>*/}
                     <Col xs="12">
                         <Card className="card-chart">
                             <CardHeader>
@@ -348,28 +418,44 @@ class MainDashboard extends Component {
                                         <Card className="card-user" style={{height: "70%"}}>
                                             <CardBody style={{height: "70%"}}>
                                                 <CardText/>
-                                                <div className="author">
-                                                    <div className="block block-one"/>
-                                                    <div className="block block-two"/>
-                                                    <div className="block block-three"/>
-                                                    <div className="block block-four"/>
-                                                    <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                                                <div className=""
+                                                     style={{justifyContent: 'center', alignItems: 'center'}}>
+                                                    {/*, alignItems: 'center', display: "flex"}*/}
+                                                    {/*<div className="block block-one"/>*/}
+                                                    {/*<div className="block block-two"/>*/}
+                                                    {/*<div className="block block-three"/>*/}
+                                                    {/*<div className="block block-four"/>*/}
+                                                    <Row>
                                                         <img
-                                                            alt="..."
-                                                            className="avatar"
-                                                            src={`data:image/jpeg;base64,${this.props.location.state.employee.photo}`}
-                                                            style={{marginTop: "0em", width: "14em", height: "14em"}}
+                                                            src={Logo}
+                                                            style={{width: "18em", height: "9em"}}
                                                         />
-                                                        <h3 className="title">{this.props.location.state.employee.fullName}</h3>
-                                                    </a>
-                                                    <p className="description">{this.props.location.state.employee.position}</p>
+                                                    </Row>
+                                                    <Row>
+                                                        <a href="#pablo" onClick={(e) => e.preventDefault()}
+                                                           style={{marginLeft: "27%", marginTop: "-10%"}}>
+                                                            <img
+                                                                alt="..."
+                                                                className="avatar"
+                                                                src={`data:image/jpeg;base64,${this.props.location.state.employee.photo}`}
+                                                                style={{
+                                                                    marginLeft: "0em",
+                                                                    width: "14em",
+                                                                    height: "14em"
+                                                                }}
+                                                            />
+                                                            <h3 className="title">{this.props.location.state.employee.fullName}</h3>
+                                                            <p className="description">{this.props.location.state.employee.position}</p>
+                                                        </a>
+
+                                                    </Row>
                                                 </div>
 
                                             </CardBody>
 
                                         </Card>
                                     </Col>
-                                    <Col sm={8} style={{marginTop: '5%'}}>
+                                    <Col sm={8} style={{marginTop: '6.5%'}}>
                                         {/*<Row style={{ width: '90%', height: '10%', marginLeft:"5%" }}>*/}
                                         <Col lg="2.9">
                                             <motion.div
@@ -378,7 +464,7 @@ class MainDashboard extends Component {
                                                 // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(true, this.state.anosmiaLoaded, "Smell Level", this.state.anosmia_status)}
+                                                {this.displayFlipCard(true, this.state.anosmiaLoaded, "Smell Level", this.state.anosmiaStatus)}
                                                 {/*{this.state.anosmiaLoaded ?*/}
 
                                                 {/*    <FlipCard componentName="Smell Level" currentStatus="Yet to Begin"*/}
@@ -399,7 +485,7 @@ class MainDashboard extends Component {
                                                 // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(this.state.anosmiaDisplayed, this.state.coughLoaded, "Cough", this.state.predictLabel)}
+                                                {this.displayFlipCard(this.state.anosmiaDisplayed, this.state.coughLoaded, "Cough", this.state.coughStatus)}
                                                 {/*{this.state.anosmiaDisplayed ?*/}
                                                 {/*    <div>*/}
                                                 {/*        /!*{this.state.coughLoaded ?*!/*/}
@@ -421,13 +507,13 @@ class MainDashboard extends Component {
                                                 // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(this.state.coughDisplayed, this.state.breathCountLoaded, "Breath Count", this.state.breath_count)}
+                                                {this.displayFlipCard(this.state.coughDisplayed, this.state.breathCountLoaded, "Breath Count", this.state.breathStatus)}
                                                 {/*{this.state.coughDisplayed ?*/}
                                                 {/*    <div>*/}
                                                 {/*        {this.state.breathCountLoaded ?*/}
                                                 {/*            <FlipCard componentName="Breathing Count"*/}
                                                 {/*                      currentStatus="Yet to Begin"*/}
-                                                {/*                      componentValue={this.state.breath_count}*/}
+                                                {/*                      componentValue={this.state.breathStatus}*/}
                                                 {/*                      flipped={true}/> :*/}
                                                 {/*            <FlipCard componentName="Breathing Count"*/}
                                                 {/*                      currentStatus="Yet to Begin"*/}
@@ -446,15 +532,15 @@ class MainDashboard extends Component {
                                                 // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(this.state.breathCountDisplayed, this.state.temperatureLoaded, "Temperature", this.state.temperature)}
+                                                {this.displayFlipCard(this.state.breathCountDisplayed, this.state.temperatureStatusLoaded, "Temperature", this.state.temperatureStatus)}
                                                 {/*{this.state.breathCountDisplayed ?*/}
                                                 {/*    <div>*/}
-                                                {/*        {this.state.temperatureLoaded ?*/}
-                                                {/*            <FlipCard componentName="Body Temperature"*/}
+                                                {/*        {this.state.temperatureStatusLoaded ?*/}
+                                                {/*            <FlipCard componentName="Body temperatureStatus"*/}
                                                 {/*                      currentStatus="Yet to Begin"*/}
-                                                {/*                      componentValue={this.state.temperature}*/}
+                                                {/*                      componentValue={this.state.temperatureStatus}*/}
                                                 {/*                      flipped={true}/> :*/}
-                                                {/*            <FlipCard componentName="Body Temperature"*/}
+                                                {/*            <FlipCard componentName="Body temperatureStatus"*/}
                                                 {/*                      currentStatus="Yet to Begin"*/}
                                                 {/*                      componentValue="Un Normal" flipped={false}/>*/}
                                                 {/*        }*/}
@@ -485,10 +571,6 @@ class MainDashboard extends Component {
                                 </Row>
 
                             </CardHeader>
-
-                            {/*<CardBody>*/}
-
-                            {/*</CardBody>*/}
                         </Card>
                     </Col>
                 </Row>
@@ -497,4 +579,4 @@ class MainDashboard extends Component {
     }
 };
 
-export default MainDashboard;
+export default withRouter(MainDashboard);

@@ -4,7 +4,7 @@ const path = require('path');
 
 // const server = require("../backend/index")
 
-const {app, BrowserWindow,Menu} = electron;
+const {app, screen, BrowserWindow,Menu} = electron;
 
 const isDev = require('electron-is-dev');
 // require('./../flaskAPI/app.py');
@@ -14,8 +14,10 @@ let addWindow;
 
 //Listen for app to be ready
 app.on('ready',function (){
+    const { width, height } = screen.getPrimaryDisplay().workAreaSize
     mainWindow = new BrowserWindow(({
-        webPreferences: { nodeIntegration: true }
+        webPreferences: { nodeIntegration: true },
+        width, height
     }));
     mainWindow.maximize();
     mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`);

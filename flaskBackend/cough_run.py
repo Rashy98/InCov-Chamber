@@ -142,20 +142,22 @@ def detect():
     return detect_categories[np.argmax(predDe[0])]
 
 def sendPrediction():
+    print(detect())
     if detect() == 'coughing':
-        print(detect())
+
         preds = predict()
         print(preds)
         response = {
             'prediction_label': categories[np.argmax(preds[0])],
             'percentage': str(preds[0][np.argmax(preds[0])])
         }
-        return response
+
     else:
         response = {
             'prediction_label': 'no cough',
         }
-        return response
+
+    return response
 
 def coughResemb():
     if (detect() == 'coughing'):
@@ -182,3 +184,4 @@ def recordCough():
 
 # recordCough()
 # Create_spectogram.createWavelets(cough='cough.wav')
+# sendPrediction()

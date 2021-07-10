@@ -14,7 +14,7 @@ def recordCough():
 
 def recordAnosmia():
     print('-------------------recording-----------------')
-    recording = sd.rec(int(10 * fs), samplerate=fs, channels=1)
+    recording = sd.rec(int(5 * fs), samplerate=fs, channels=1)
     sd.wait()
     print('-------------------done----------------------')
     return recording

@@ -43,7 +43,7 @@ class LandingApp extends Component {
 
         return (
             <div className="card-user" style={{position: 'relative', overflow: "hidden"}}>
-                <div style={{position: 'absolute', minWidth: "100%", Height: "100%"}}>
+                <div style={{position: 'absolute', minWidth: "100%", Height: "100%", marginTop: "1%"}}>
                     <ParticleBackground/>
 
                 </div>
@@ -58,14 +58,14 @@ class LandingApp extends Component {
 
                 <header className="App-header">
                     <img src={logos} className="App-logo" alt="logo"/>
-                    <h3 style={{color: "#61dafb"}}>
+                    <h1 style={{color: "white"}}>
                         Welcome to INCOV Chamber
-                    </h3>
+                    </h1>
                     {this.state.emp_name === "" ?
-                        <h3 style={{color: "#61dafb"}}>
+                        <h2 style={{color: "#61dafb"}}>
                             {/*{this.state.emp_name}*/}
-                            Initializing....
-                        </h3> :
+                            Recognizing your Face...
+                        </h2> :
                         <div>
                             return <Redirect to={{pathname:"/UserDetailsDashboard", state:{id:this.state.emp_name}}}/>
                         </div>
