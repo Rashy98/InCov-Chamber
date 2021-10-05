@@ -39,6 +39,7 @@ import {
     UncontrolledTooltip,
 } from "reactstrap";
 import {Redirect, withRouter} from "react-router-dom";
+import axios from "axios";
 
 
 class MainDashboard extends Component {
@@ -54,17 +55,20 @@ class MainDashboard extends Component {
             coughStatus: '',
             temperatureStatus: 0,
             breathStatus: 0,
+            heartRate: 0,
 
             thermalModuleLoaded: false,
             temperatureStatusLoaded: false,
             breathCountLoaded: false,
             coughLoaded: false,
             anosmiaLoaded: false,
+            heartRateLoaded: false,
 
             anosmiaDisplayed: false,
             coughDisplayed: false,
             breathCountDisplayed: false,
             temperatureStatusDisplayed: false,
+            heartRateDisplayed: false,
 
             isSafe: false
         }
@@ -82,6 +86,8 @@ class MainDashboard extends Component {
         this.displayFlipCard = this.displayFlipCard.bind(this)
         this.setDisplayState = this.setDisplayState.bind(this)
         this.handleAudio = this.handleAudio.bind(this)
+        this.get_heartRate = this.get_heartRate.bind(this)
+        this.saveToDB = this.saveToDB.bind(this)
     }
 
     async componentDidMount() {
@@ -89,6 +95,7 @@ class MainDashboard extends Component {
         await this.handleAudio(welcome_audio)
         this.soundCommand()
         this.thermal_module()
+        this.get_heartRate()
 
         // this.audio = new Audio(welcome_audio)
         // this.audio.load()
@@ -105,7 +112,7 @@ class MainDashboard extends Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevState.temperatureStatusDisplayed !== this.state.temperatureStatusDisplayed) {
 
-            // var _isSafe = false
+            // this.saveToDB()
 
             if ((this.state.anosmiaStatus === "Normal") &&
                 (this.state.coughStatus === "Normal") &&
@@ -122,11 +129,6 @@ class MainDashboard extends Component {
                     state: {isSafe: false}
                 })
             }
-
-            // this.props.history.push({
-            //     pathname: '/FinalPage',
-            //     state: {isSafe: _isSafe}
-            // })
         }
     }
 
@@ -233,6 +235,7 @@ class MainDashboard extends Component {
                     anosmiaDisplayed: true
                 })
 
+                // setTimeout(this.PlayCoughSaying('init'), 4000)
                 this.PlayCoughSaying('init')
             });
         });
@@ -328,6 +331,24 @@ class MainDashboard extends Component {
         })
     }
 
+    get_heartRate() {
+        axios({
+            method: 'post',
+            url: "https://incovbackend.herokuapp.com/employee/getHeartRate",
+            headers: {},
+            data: {
+                empID: this.props.location.state.employee.empID
+            }
+        }).then(res => {
+            this.setState({
+                heartRate: res.data.heartRate,
+                heartRateLoaded: true
+            })
+
+            this.setDisplayState("heartRateDisplayed", null, 1500, null)
+        });
+    }
+
     getCoughPrediction() {
         let value = '';
         fetch('/predictCough', {
@@ -401,9 +422,34 @@ class MainDashboard extends Component {
 
     }
 
+    saveToDB() {
+
+        let date = new Date()
+        let _today = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear()
+        let _time = date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds()
+
+        axios({
+            method: 'post',
+            url: "https://incovbackend.herokuapp.com/employee/pushDailyReadings",
+            // url: "http://localhost:7000/employee/pushDailyReadings",
+            headers: {},
+            data: {
+                empID : this.props.location.state.employee.empID,
+                dailyReadings: {
+                    cough: this.state.coughStatus,
+                    anosmia: this.state.anosmiaStatus,
+                    fever: this.state.temperatureStatus,
+                    sob: this.state.breathStatus,
+                    date: _today,
+                    time: _time
+                }
+            }
+        })
+    }
+
     render() {
         return (
-            <div className="App">
+            <div className="App" style={{marginBottom: "-3%"}}>
                 <Row>
                     {/*<div>*/}
                     {/*    <audio className="audio-element">*/}
@@ -413,39 +459,37 @@ class MainDashboard extends Component {
                     <Col xs="12">
                         <Card className="card-chart">
                             <CardHeader>
-                                <Row style={{marginLeft: '5%'}}>
-                                    <Col sm={4} style={{marginTop: '10%'}}>
-                                        <Card className="card-user" style={{height: "70%"}}>
+                                <Row style={{marginLeft: '10%'}}>
+                                    <Col sm={4} style={{marginTop: '7.5%'}}>
+                                        <Card
+                                            className="card-user"
+                                            style={{height: "70%", backgroundColor: "white", boxShadow: "5px 5px 5px 5px rgba(0,173,131,.6)"}}>
                                             <CardBody style={{height: "70%"}}>
                                                 <CardText/>
                                                 <div className=""
                                                      style={{justifyContent: 'center', alignItems: 'center'}}>
-                                                    {/*, alignItems: 'center', display: "flex"}*/}
-                                                    {/*<div className="block block-one"/>*/}
-                                                    {/*<div className="block block-two"/>*/}
-                                                    {/*<div className="block block-three"/>*/}
-                                                    {/*<div className="block block-four"/>*/}
                                                     <Row>
                                                         <img
                                                             src={Logo}
-                                                            style={{width: "18em", height: "9em"}}
+                                                            style={{width: "18em", height: "9em", marginLeft: "20%"}}
                                                         />
                                                     </Row>
                                                     <Row>
                                                         <a href="#pablo" onClick={(e) => e.preventDefault()}
-                                                           style={{marginLeft: "27%", marginTop: "-10%"}}>
+                                                           style={{marginLeft: "23%", marginTop: "-15%"}}>
                                                             <img
                                                                 alt="..."
                                                                 className="avatar"
                                                                 src={`data:image/jpeg;base64,${this.props.location.state.employee.photo}`}
                                                                 style={{
                                                                     marginLeft: "0em",
-                                                                    width: "14em",
-                                                                    height: "14em"
+                                                                    marginBottom : "20%",
+                                                                    width: "16em",
+                                                                    height: "16em"
                                                                 }}
                                                             />
-                                                            <h3 className="title">{this.props.location.state.employee.fullName}</h3>
-                                                            <p className="description">{this.props.location.state.employee.position}</p>
+                                                            <h2 className="title" style={{marginBottom: "2%", color : "#00aa86"}}>{this.props.location.state.employee.fullName}</h2>
+                                                            <h2 className="description" style={{color : "black"}}>{this.props.location.state.employee.position}</h2>
                                                         </a>
 
                                                     </Row>
@@ -455,7 +499,7 @@ class MainDashboard extends Component {
 
                                         </Card>
                                     </Col>
-                                    <Col sm={8} style={{marginTop: '6.5%'}}>
+                                    <Col sm={8}>
                                         {/*<Row style={{ width: '90%', height: '10%', marginLeft:"5%" }}>*/}
                                         <Col lg="2.9">
                                             <motion.div
@@ -464,7 +508,31 @@ class MainDashboard extends Component {
                                                 // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(true, this.state.anosmiaLoaded, "Smell Level", this.state.anosmiaStatus)}
+                                                {this.displayFlipCard(true, this.state.heartRateLoaded, "Heart Rate", this.state.heartRate)}
+                                                {/*{this.state.breathCountDisplayed ?*/}
+                                                {/*    <div>*/}
+                                                {/*        {this.state.temperatureStatusLoaded ?*/}
+                                                {/*            <FlipCard componentName="Body temperatureStatus"*/}
+                                                {/*                      currentStatus="Yet to Begin"*/}
+                                                {/*                      componentValue={this.state.temperatureStatus}*/}
+                                                {/*                      flipped={true}/> :*/}
+                                                {/*            <FlipCard componentName="Body temperatureStatus"*/}
+                                                {/*                      currentStatus="Yet to Begin"*/}
+                                                {/*                      componentValue="Un Normal" flipped={false}/>*/}
+                                                {/*        }*/}
+                                                {/*    </div>*/}
+                                                {/*    : ""*/}
+                                                {/*}*/}
+                                            </motion.div>
+                                        </Col>
+                                        <Col lg="2.9">
+                                            <motion.div
+                                                initial={{scaleY: 0}}
+                                                animate={{scaleY: 1}}
+                                                // exit={{scaleY: 0}}
+                                                transition={{duration: 0.5}}
+                                            >
+                                                {this.displayFlipCard(this.state.heartRateDisplayed, this.state.anosmiaLoaded, "Smell Level", this.state.anosmiaStatus)}
                                                 {/*{this.state.anosmiaLoaded ?*/}
 
                                                 {/*    <FlipCard componentName="Smell Level" currentStatus="Yet to Begin"*/}
@@ -580,3 +648,14 @@ class MainDashboard extends Component {
 };
 
 export default withRouter(MainDashboard);
+
+
+// style={{
+                             //     border: "5px solid #013a55",
+                             //     width: "35%",
+                             //     minHeight: "40%",
+                             //     marginLeft: "auto",
+                             //     marginRight: "auto",
+                             //     alignContent: "center",
+                             //     borderRadius: "5%"
+                             // }}

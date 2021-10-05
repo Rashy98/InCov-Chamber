@@ -98,74 +98,37 @@ class FinalPage extends Component {
 
     render() {
         return (
-            <div className="App">
-                <Row>
-                    <Col xl="12">
-                        <Card style={{marginTop: "2.5%"}}>
-                            <CardHeader>
-                                <Row>
-                                    <Col md="">
-                                        <Card className="card-two">
-                                            <CardBody>
-                                                <CardText/>
-                                                <div className="author">
-                                                    {/*<div className="block block-one"/>*/}
-                                                    {/*<div className="block block-two"/>*/}
-                                                    {/*<div className="block block-three"/>*/}
-                                                    {/*<div className="block block-four"/>*/}
-                                                    <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                                                        <img
-                                                            className="avatar"
-                                                            src={logo}
-                                                        />
-                                                        {/*    <h2 className="title">{this.state.name}</h2>*/}
-                                                    </a>
-                                                    {/*<h4 className="description">{this.state.position}</h4>*/}
-                                                </div>
-                                                <h1 style={{color: "black"}}>Thank You!</h1>
-                                                <br/>
-                                                {this.props.location.state.isSafe ?
-                                                    <h2 className="" style={{color: 'black'}}>You may leave
-                                                        the chamber</h2>
-                                                    :
-                                                    <h2 className="" style={{color: 'black'}}>Please wait
-                                                        outside the chamber </h2>
-                                                }
-                                                {/*<Loader*/}
-                                                {/*    type="Puff"*/}
-                                                {/*    color="#00BFFF"*/}
-                                                {/*    height={50}*/}
-                                                {/*    width={50}*/}
-                                                {/*    timeout={60000} //30 secs*/}
-                                                {/*/>*/}
-                                                {/*{this.state.isLoading ?*/}
-                                                {/*    ""*/}
-                                                {/*    :*/}
-                                                {/*    <div>*/}
-                                                {/*        {this.timeOutFn()}*/}
-                                                {/*        {this.state.redirect ?*/}
-                                                {/*            <div>*/}
-                                                {/*                return (*/}
-                                                {/*                <Redirect to={{*/}
-                                                {/*                    pathname: "/",*/}
-                                                {/*                    state: {employee: this.state.employees}*/}
-                                                {/*                }}*/}
-                                                {/*                />*/}
-                                                {/*                )*/}
-                                                {/*            </div>*/}
-                                                {/*            : ""*/}
-                                                {/*        }*/}
+            <div className="App" >
+                <Card className="card-two">
+                    <CardBody>
+                        <CardText/>
+                        <div className="author">
+                            <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                                <img
+                                    style={{width: "300px", height: "300px", marginLeft: "2.4%", borderRadius: "0%"}}
+                                    className="avatar"
+                                    src={logo}
+                                />
+                                {/*    <h2 className="title">{this.state.name}</h2>*/}
+                            </a>
+                            {/*<h4 className="d
 
-                                                {/*    </div>*/}
-                                                {/*}*/}
-                                            </CardBody>
-                                        </Card>
-                                    </Col>
-                                </Row>
-                            </CardHeader>
-                        </Card>
-                    </Col>
-                </Row>
+
+
+
+
+
+                               escription">{this.state.position}</h4>*/}
+                        </div>
+                        <p style={{color: "#00aa86", fontWeight: "bold", fontSize: "8vh", marginLeft: "1%"}}>Thank You!</p>
+                        <br/>
+                        {this.props.location.state.isSafe ?
+                            <p className="" style={{color: 'black', fontSize: "4vh", marginLeft: "1.4%"}}>You may leave the chamber</p>
+                            :
+                            <p className="" style={{color: 'black', fontSize: "4vh", marginLeft: "1.4%"}}>Please wait outside the chamber </p>
+                        }
+                    </CardBody>
+                </Card>
             </div>
         );
     }

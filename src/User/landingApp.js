@@ -56,13 +56,13 @@ class LandingApp extends Component {
                 {/*</div>*/}
 
 
-                <header className="App-header">
+                <header className="App-header1">
                     <img src={logos} className="App-logo" alt="logo"/>
-                    <h1 style={{color: "white"}}>
+                    <h1 style={{color: "black", fontWeight: "bold"}}>
                         Welcome to INCOV Chamber
                     </h1>
                     {this.state.emp_name === "" ?
-                        <h2 style={{color: "#61dafb"}}>
+                        <h2 style={{color: "#00aa86", fontWeight: "bold"}}>
                             {/*{this.state.emp_name}*/}
                             Recognizing your Face...
                         </h2> :

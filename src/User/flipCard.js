@@ -21,15 +21,16 @@ class FlipCard extends Component {
                 style={{
                     width: '60%',
                     height: '10%',
-                    marginLeft: '20%'
+                    marginLeft: '20%',
+                    boxShadow: "0 0px 0px 0 rgba(0,0,0,.2)"
                 }} /// these are optional style, it is not necessary
             >
-                <FrontSide>
+                <FrontSide style={{boxShadow: "0 0px 0px 0 rgba(0,0,0,.2)"}}>
                     <Card >
                         <CardHeader style={{minHeight: "9em"}}>
-                            <h2 className="">{this.props.componentName}</h2>
-                            <CardTitle tag="h3">
-                                <i className="tim-icons icon-bell-55 text-info"/> {this.props.currentStatus}
+                            <h1 className="" style={{color: "white", fontWeight: "bold"}}>{this.props.componentName}</h1>
+                            <CardTitle tag="h2">
+                                 {this.props.currentStatus}
                             </CardTitle>
                         </CardHeader>
                         {/*<CardBody>*/}
@@ -38,12 +39,12 @@ class FlipCard extends Component {
                     </Card>
 
                 </FrontSide>
-                <BackSide>
-                    <Card >
+                <BackSide style={{boxShadow: "0 0px 0px 0 rgba(0,0,0,.2)"}}>
+                    <Card style={{backgroundColor : "#60BFAA"}}>
                         <CardHeader style={{minHeight: "9em"}}>
-                            <h2 className="">{this.props.componentName}</h2>
-                            <CardTitle tag="h3">
-                                <i className="tim-icons icon-bell-55 text-info"/> {this.props.componentValue}
+                            <h1 className="" style={{color: "#1A425D", fontWeight: "bold"}}>{this.props.componentName}</h1>
+                            <CardTitle tag="h2" >
+                                 {this.props.componentValue}
                             </CardTitle>
                         </CardHeader>
                         {/*<CardBody>*/}

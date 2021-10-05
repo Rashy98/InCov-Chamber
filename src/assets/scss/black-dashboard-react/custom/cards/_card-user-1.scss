@@ -1,7 +1,7 @@
 .card-two{
   overflow: hidden;
-  //background-color: white;
-  background-image: url('./../../../../Images/background-image.png');
+  background-color: transparent;
+  //background-image: url('./../../../../Images/NewBack.jpg');
   background-size: cover;
 
 
@@ -60,7 +60,7 @@
     margin-top: 100px;
     width: 200px;
     height: 200px;
-    border: 5px solid lighten($primary, 5%);
+    //border: 5px solid lighten($primary, 5%);
     border-bottom-color: $transparent-bg;
     background-color: $transparent-bg;
     position: relative;

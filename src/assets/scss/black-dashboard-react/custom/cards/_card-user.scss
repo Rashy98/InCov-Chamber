@@ -1,6 +1,7 @@
 .card-user {
   overflow: hidden;
-  background-image: url('./../../../../Images/SLIIT.png');
+  //background-image: url('./../../../../Images/SLIIT.png');
+  background-color: transparent;
   background-size: cover;
 
   .image {
@@ -56,9 +57,9 @@
 
   .avatar {
     margin-top: 100px;
-    width: 200px;
-    height: 200px;
-    border: 5px solid lighten($black, 5%);
+    width: 250px;
+    height: 250px;
+    //border: 5px solid lighten($black, 5%);
     border-bottom-color: $transparent-bg;
     background-color: $transparent-bg;
     position: relative;
