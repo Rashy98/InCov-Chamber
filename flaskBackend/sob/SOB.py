@@ -1,3 +1,11 @@
+"""
+    This module will calculate the respiration rate
+
+    Contains all the methods related SOB module
+
+    Returns total breath count
+"""
+
 from imutils import face_utils
 import cv2 as cv
 import numpy as np
@@ -5,35 +13,65 @@ import dlib
 import imutils
 import time
 
+# initialize variables
 width_500 = 500
 width_250 = 250
 feature_start = 30
 feature_end = 36
 
+# initialize dlib's face detector (HOG-based) and then create
+# the facial landmark predictor
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor('./sob/trainingModels/shape_predictor_68_face_landmarks.dat')
-# predictor = dlib.shape_predictor('./trainingModels/shape_predictor_68_face_landmarks.dat')
 
-def resizeImage(img):
+
+def resize_image(img):
+    """
+        Resize the image to 500 pixels width
+
+        :param img: image to resize
+        :return: resized image
+    """
+
     return imutils.resize(image=img, width=width_500)
 
-def highlightROI(clone, shape):
-    for (x, y) in shape[feature_start:feature_end]:
-        cv.circle(clone, (x,y), 1, (0, 0, 255), -1)
 
-def getNormalROI(frame, x, y, w, h):
+def highlight_roi(clone, shape):
+    """
+        Highlights the nostril area of the frames by web camera
+
+        :param clone: a clone of the frame from average web camera
+        :param shape: numpy array which contains (x,y) coordinates of facial landmarks
+    """
+    for (x, y) in shape[feature_start:feature_end]:
+        cv.circle(clone, (x, y), 1, (0, 0, 255), -1)
+
+
+def get_nostril_area(frame, x, y, w, h):
+    """
+        Extract nostril area from the received frame
+
+        :param frame: frame to extract the nostril area
+        :param x: starting x coordinate of the ROI
+        :param y: starting y coordinate of the ROI
+        :param w: width of the ROI to be extracted
+        :param h: height of the ROI to be extracted
+        :return: extracted ROI (nostril area)
+    """
     roi = frame[y:y + h, x:x + w]
     roi = imutils.resize(roi, width=width_250, inter=cv.INTER_CUBIC)
 
     return roi
 
-def getThermalROI(frame, x, y, w, h):
-    roi_thermal = frame[y:y + h, x:x + w]
-    roi_thermal = imutils.resize(roi_thermal, width=width_250, inter=cv.INTER_CUBIC)
 
-    return roi_thermal
+# def get_thermal_roi(frame, x, y, w, h):
+#     roi_thermal = frame[y:y + h, x:x + w]
+#     roi_thermal = imutils.resize(roi_thermal, width=width_250, inter=cv.INTER_CUBIC)
+#
+#     return roi_thermal
 
-def displayOutput(breath_count, roi_binary, roi, roi_thermal, clone, cap1_frame):
+
+def display_output(breath_count, roi_binary, roi, roi_thermal, clone, cap1_frame):
     display_text = ("Breath Count " + str(breath_count))
     cv.putText(roi_binary, display_text, (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
@@ -43,48 +81,60 @@ def displayOutput(breath_count, roi_binary, roi, roi_thermal, clone, cap1_frame)
     cv.imshow("Clone", clone)
     cv.imshow("Thermal", cap1_frame)
 
-def SOB_run(cap0, cap1):
-    # cap0 = cv.VideoCapture(0)
-    # cap1 = cv.VideoCapture(1)
 
-    # low_green = np.array([50, 50, 55])
-    # high_green = np.array([95, 255, 255])
+def sob_run(cap0, cap1):
+    """
+        Starts the SOB component
+
+        :param cap0: camera instance for web camera
+        :param cap1: camera instance for thermal camera
+        :return: total breath count within 30 seconds
+    """
+
+    # defined lower and upper hue values of green color
+    # used to highlight color change near nostril area
     low_green = np.array([30, 52, 72])
     high_green = np.array([110, 255, 255])
 
+    # initialize temporary variables
     breath_count = 0
     previous_frame = 0
     time_end = time.time() + 30
 
     while time.time() < time_end:
-        isTrue, cap0_frame = cap0.read()
-        _, cap1_frame = cap1.read()
+        # accepts frames from the cameras
+        is_true, cap0_frame = cap0.read()
+        is_true, cap1_frame = cap1.read()
 
-        cap0_frame = resizeImage(cap0_frame)
-        cap1_frame = resizeImage(cap1_frame)
+        cap0_frame = resize_image(cap0_frame)
+        cap1_frame = resize_image(cap1_frame)
 
-        frame_gray = cv.cvtColor(cap0_frame, cv.COLOR_RGB2GRAY)
-        # frame_hsv = cv.cvtColor(cap0_frame, cv.COLOR_RGB2HSV)
+        frame_gray = cv.cvtColor(cap0_frame, cv.COLOR_RGB2GRAY)  # convert web camera's frame to gray scale
 
-        rects = detector(frame_gray, 1)
+        rects = detector(frame_gray, 1)  # detect the faces in gray scale image
 
         for (i, rect) in enumerate(rects):
-            shape = predictor(frame_gray, rect)
-            shape = face_utils.shape_to_np(shape)
+            shape = predictor(frame_gray, rect)  # determine facial landmarks
+            shape = face_utils.shape_to_np(shape)  # converts landmark (x,y) coordinates to numpy array
 
             clone = cap0_frame.copy()
             cv.putText(clone, "Nose", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 
-            highlightROI(clone, shape)
+            highlight_roi(clone, shape)
 
+            # get (x,y) coordinates, width, height of the nostril area by passing staring and ending landmarks
+            # of the nostril area referring to dlib's 68 facial landmarks
             (x, y, w, h) = cv.boundingRect(np.array([shape[feature_start:feature_end]]))
-            roi = getNormalROI(cap0_frame, x, y, w, h)
-            roi_thermal = getThermalROI(cap1_frame, x, y, w, h)
-            hsv_thermal = cv.cvtColor(roi_thermal, cv.COLOR_BGR2HSV)
-            roi_binary = cv.inRange(hsv_thermal, low_green, high_green)
 
-            max_pix = np.amax(roi_binary)
+            roi_normal = get_nostril_area(cap0_frame, x, y, w, h)  # get nostril area from web camera's frame
+            roi_thermal = get_nostril_area(cap1_frame, x, y, w, h)  # get nostril area from thermal camera's frame
+            hsv_thermal = cv.cvtColor(roi_thermal, cv.COLOR_BGR2HSV)  # convert roi_thermal to hsv
+            roi_binary = cv.inRange(hsv_thermal, low_green, high_green)  # get binary image of breathing
 
+            max_pix = np.amax(roi_binary)  # get maximum pixel value of the binary image
+
+            # count each breathing by analysing the roi_binary
+            # if (max_pix == 0) and (previous_frame == 255) then, increments the breath count by 1
             if max_pix >= 255:
                 previous_frame = 255
             else:
@@ -94,19 +144,12 @@ def SOB_run(cap0, cap1):
 
                 previous_frame = 0
 
-            displayOutput(breath_count, roi_binary, roi, roi_thermal, clone, cap1_frame)
+            display_output(breath_count, roi_binary, roi_normal, roi_thermal, clone, cap1_frame)
 
         if cv.waitKey(20) & 0xFF == ord('q'):
             break
 
-    # cap0.release()
-    # cap1.release()
     cv.destroyAllWindows()
-
-    # result = {
-    #     'breath_count': breath_count
-    # }
 
     return breath_count
 
-# SOB_run()

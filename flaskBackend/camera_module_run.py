@@ -20,13 +20,14 @@ def run_auth_module():
 
 def run_thermal_modules():
     temperature = Fever.Fever_start(cap1)
-    breath_count = SOB.SOB_run(cap0, cap1)
+    breath_count = SOB.sob_run(cap0, cap1)
 
     result = {
         'temperature': temperature,
         'breath_count': breath_count
     }
-    return result
+    print(result)
+    # return result
 
 
 def get_temperature():
@@ -39,7 +40,7 @@ def get_temperature():
 
 
 def get_breath_count():
-    breath_count = SOB.SOB_run(cap0, cap1)
+    breath_count = SOB.sob_run(cap0, cap1)
 
     result = {
         'breath_count': breath_count
