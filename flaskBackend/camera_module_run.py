@@ -26,8 +26,8 @@ def run_thermal_modules():
         'temperature': temperature,
         'breath_count': breath_count
     }
-    print(result)
-    # return result
+
+    return result
 
 
 def get_temperature():

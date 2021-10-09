@@ -7,6 +7,7 @@
 """
 
 from imutils import face_utils
+from flaskBackend.logs import log_handler
 import cv2 as cv
 import numpy as np
 import dlib
@@ -33,7 +34,10 @@ def resize_image(img):
         :return: resized image
     """
 
-    return imutils.resize(image=img, width=width_500)
+    try:
+        return imutils.resize(image=img, width=width_500)
+    except AttributeError:
+        log_handler.log("sob", "CRITICAL", "resize_image", 38, "Cannot load the frame. Check for camera connection")
 
 
 def highlight_roi(clone, shape):
