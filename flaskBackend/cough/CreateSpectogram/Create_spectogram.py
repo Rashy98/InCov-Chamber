@@ -1,38 +1,28 @@
-import numpy as np
-from scipy.io import wavfile
-from sklearn.preprocessing import scale
+"""
+To create spectrogram from the given audio file
+"""
+
+# Importing needed libraries
 import librosa.display
 import librosa
 import matplotlib.pyplot as plt
-import os
 
-import matplotlib.pyplot as plt
-# import flaskBackend
-from scipy import signal
-from scipy.io import wavfile
+# initializing the saving path to the spectrogram
+spectrogram_save_path = './spectograms/spectogram.png'
 
-# def createWavelets(cough):
-#     sample_rate, samples = wavfile.read(cough)
-#     frequencies, times, spectrogram = signal.spectrogram(samples, sample_rate)
-#     plt.pcolormesh(times, frequencies, spectrogram)
-#     plt.savefig('./spectograms/spectogram.png', dpi=300)
-#     print('----------spectogram saved--------------')
-#
-
-    # plt.imshow(spectrogram)
-    # plt.ylabel('Frequency [Hz]')
-    # plt.xlabel('Time [sec]')
-    # plt.show()
 
 def createWavelets(cough):
-    x , sr = librosa.load(cough)
-    X = librosa.stft(x)
-    Xdb = librosa.amplitude_to_db(abs(X))
+    """
+    Method to create the spectrogram from the audio for the cough component
+    :param cough:
+    :return: 'created' : return 'created' when the spectrogram is created and saved
+    """
+    x, sr = librosa.load(cough)
+    xl = librosa.stft(x)
+    xdb = librosa.amplitude_to_db(abs(xl))
     plt.figure(figsize=(14, 5))
-    librosa.display.specshow(Xdb, sr=sr, x_axis='time', y_axis='hz')
-    plt.savefig( './spectograms/spectogram.png', dpi = 300)
-    print('----------spectogram saved--------------')
-    # return 'created'
+    librosa.display.specshow(xdb, sr=sr, x_axis='time', y_axis='hz')
+    plt.savefig(spectrogram_save_path, dpi=300)
 
-# createWavelets('')
-# createWavelets('')
+    return 'created'
+

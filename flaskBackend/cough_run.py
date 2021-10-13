@@ -1,187 +1,127 @@
-from flask import Flask, request, jsonify,render_template, redirect, url_for
-from flask_cors import CORS
-import io
-import tensorflow as tf
-import base64
-# from PIL import Image
-from keras.applications.vgg16 import VGG16
-from keras.preprocessing import image
-from keras.models import Sequential, load_model
-from keras.preprocessing.image import load_img
-from keras.preprocessing.image import img_to_array
-from keras.applications.vgg16 import preprocess_input
-from keras.applications.vgg16 import decode_predictions
-from keras.applications.vgg16 import VGG16
-import numpy as np
-# import json
-import json
-# from pyimagesearch import config
-import logging
-from keras.models import model_from_json
-from keras.layers import Layer
+"""
+    All cough related methods
+"""
+
+# Importing needed libraries
 from cough.AudioRecording import audioRecorder
-import time
 from cough.CreateSpectogram import Create_spectogram
+from keras.preprocessing import image
+from keras.preprocessing.image import img_to_array
+from keras.layers import Layer
+from scipy.io.wavfile import write
+import numpy as np
 import os
-from scipy.io.wavfile import write,read
+import tensorflow as tf
+
+# initializing path to the cough resemblance model path
+resemblance_model_path = 'cough/cough-resemblance/myVggCoughResModel.h5'
+
+# initializing path to the cough detection model path
+detection_model_path = 'cough/cough-detection/myVggCoughDetectionModel.h5'
+
+# initializing path to the spectrogram
+spectrogram_path = './spectograms/spectogram.png'
+
+categories = ['healthy', 'positive']  # Define categories for cough resemblance
+detect_categories = ['coughing', 'non-cough']  # Define categories for cough detection
 
 
-class LabelLimitLayer(Layer):
+def record_cough():
+    """
+        Method to record audio and to convert the recorded audio into a spectrogram
+        :returns recording_status
+    """
+    recording = audioRecorder.recordCough()
+    write('cough.wav', 44100, recording)
 
-    def __init__(self, labels, topn, **kwargs):
-        self.labels = labels
-        self.topn = topn
-        super(LabelLimitLayer, self).__init__(**kwargs)
+    if os.stat('cough.wav').st_size == 0:
+        recording_status = 'No audio'
+    else:
+        coughRecording = 'cough.wav'
+        Create_spectogram.createWavelets(cough=coughRecording)
+        recording_status = 'Recording done'
 
-    def call(self, x):
-        batch_size = tf.shape(x)[0]
-
-        tf_labels = tf.constant([self.labels], dtype="string")
-        tf_labels = tf.tile(tf_labels,[batch_size,1])
-
-        top_k = tf.nn.top_k(x, k=self.topn, sorted=True, name="top_k").indices
-
-        top_conf = tf.gather(x, top_k, batch_dims=1)
-        top_labels = tf.gather(tf_labels, top_k, batch_dims=1)
-        return [top_conf, top_labels]
-
-    def compute_output_shape(self, input_shape):
-        batch_size = input_shape[0]
-        top_shape = (batch_size, self.topn)
-        return [top_shape, top_shape]
-
-    def get_config(self):
-        config={'labels':self.labels,
-                'topn':self.topn}
-        base_config = super(LabelLimitLayer, self).get_config()
-        return dict(list(base_config.items()) + list(config.items()))
+    return recording_status
 
 
-
-# with open("coughResemblance_label_map.json", 'r') as f:
-#     class_names = json.load(f)
-#
-# items = list(class_names.items())
-# class_names_arr = np.array(items)
-# print(class_names_arr);
-#
-# with open("cough_label_map.json", 'r') as f:
-#     class_names_detect = json.load(f)
-#
-# items = list(class_names_detect.items())
-# class_names_detect_arr = np.array(items)
+def get_resemblance_model():
+    """
+        Method to call cough resemblance model
+    """
+    global resemblance_model  # creating a global variable for the cough resemblance model
+    resemblance_model = tf.keras.models.load_model(resemblance_model_path)
+    resemblance_model.summary()  # prints model summary
 
 
+def get_detection_model():
+    """
+        Method to call cough detection model
+    """
+    global detection_model
+
+    detection_model = tf.keras.models.load_model(detection_model_path)
+    detection_model.summary()  # prints model summary
 
 
-def getModel():
+def preprocess_image(spectrogram):
+    """
+        Preprocess acquired spectrogram to use in prediction models
+        :param spectrogram: unprocessed spectrogram
+        :returns processed spectrogram
+    """
 
-    global model
-    model= tf.keras.models.load_model('cough/cough-resemblance/myVggCoughResModel.h5', custom_objects={"LabelLimitLayer":LabelLimitLayer})
-    model.summary();
-    print('* Model Loaded!')
-
-def getDetectModel():
-    global detectModel
-    detectModel = tf.keras.models.load_model('cough/cough-detection/myVggCoughDetectionModel.h5',custom_objects={"LabelLimitLayer":LabelLimitLayer})
-    detectModel.summary();
-    # model = load_model('esc50_vgg19_stft_weights_train_last_3_base_layers_best.hdf5')
-    print('* detectModel Loaded!')
-
-def preprocess_image(image, target_size):
-    if image.mode != "RGB":
-        image = image.convert("RGB")
-    image = image.resize(target_size)
-    image = img_to_array(image)
-    image = np.expand_dims(image, axis=0)
-    return image
-
-print(" * Loading Keras models...")
-
-
-getModel()
-
-getDetectModel()
-
-
-def get_top_k_predictions(preds, label_map, k=5, print_flag=False):
-    print(label_map)
-    sorted_array = np.argsort(preds)[::-1]
-    top_k = sorted_array[:k]
-    label_map_flip = dict((v,k) for k,v in label_map.items())
-    y_pred = []
-    for label_index in top_k:
-        if print_flag:
-            print("{} ({})".format(label_map_flip[label_index], preds[label_index]))
-        y_pred.append(label_map_flip[label_index])
-    return y_pred
-
-
-categories = ['healthy','positive']
-detect_categories =  ['coughing','non-cough']
-
-
-def predict():
-    image_prediction = image.load_img('./spectograms/spectogram.png', target_size=(224, 224))
-    x = image.img_to_array(image_prediction)
-    x = np.expand_dims(x, axis=0)* 1./255
-    # xNo = np.expand_dims(x, axis=0)
-    preds = model.predict(x)
-    # print("preds:" ,preds)
-    # print(categories[np.argmax(preds[0])])
-    # print(preds[0][np.argmax(preds[0])])
-    # print(preds)
-    return (preds)
+    image_array = image.img_to_array(spectrogram)  # convert image to an array
+    final_image = np.expand_dims(image_array, axis=0) * 1. / 255
+    return final_image
 
 
 def detect():
-    image_prediction = image.load_img('./spectograms/spectogram.png', target_size=(224, 224))
-    x = image.img_to_array(image_prediction)
-    x = np.expand_dims(x, axis=0)* 1./255
-    predDe = detectModel.predict(x)
-    return detect_categories[np.argmax(predDe[0])]
+    """
+           Return prediction of whether the audio contains a cough or not
+           :return detection_prediction: return the cough detection prediction label
+       """
+    image_detection = image.load_img(spectrogram_path, target_size=(224, 224))  # Load spectrogram
+    processed_spectrogram_detect = preprocess_image(image_detection)  # preprocess the spectrogram
+    predict_detection = detection_model.predict(processed_spectrogram_detect)  # Make the cough detection prediction
+    detection_prediction = detect_categories[np.argmax(predict_detection[0])]  # Get the predicted label
+    return detection_prediction
 
-def sendPrediction():
-    print(detect())
+
+def predict():
+    """
+        Return prediction of whether the cough is COVID-19 positive or not
+        :return prediction_resemblance: return the cough resemblance prediction
+    """
+    image_prediction = image.load_img(spectrogram_path, target_size=(224, 224))  # Load spectrogram
+    processed_spectrogram = preprocess_image(image_prediction)  # preprocess the spectrogram
+    prediction_resemblance = resemblance_model.predict(processed_spectrogram)  # Make the cough resemblance prediction
+    return prediction_resemblance
+
+
+def send_prediction():
+    """
+        Check whether the acquired spectrogram contains a cough and if yes, make cough resemblance prediction
+        :return: response: return prediction (if a cough is detected) or return 'no cough' as a JSON
+    """
     if detect() == 'coughing':
-
-        preds = predict()
-        print(preds)
+        prediction_resemblance = predict()  # call the 'predict()' method to make the cough resemblance prediction
         response = {
-            'prediction_label': categories[np.argmax(preds[0])],
-            'percentage': str(preds[0][np.argmax(preds[0])])
+            # get prediction label for cough resemblance
+            'prediction_label': categories[np.argmax(prediction_resemblance[0])],
+
+            # get prediction value(confidence) for cough resemblance
+            'percentage': str(prediction_resemblance[0][np.argmax(prediction_resemblance[0])])
         }
 
     else:
+
         response = {
             'prediction_label': 'no cough',
         }
 
     return response
 
-def coughResemb():
-    if (detect() == 'coughing'):
-        predict()
-    else:
-        print('No cough found')
 
-def recordCough():
-    recording = audioRecorder.recordCough()
-    write('cough.wav', 44100, recording)
-    # time.sleep(8)
-    # coughRecording = read('cough.wav')
-    # Create_spectogram.createWavelets(recording)
-    if (os.stat('cough.wav').st_size == 0):
-        'No audio'
-    else:
-        coughRecording = 'cough.wav'
-        Create_spectogram.createWavelets(cough=coughRecording)
-
-    return 'Recording done'
-
-
-# print(detect())
-
-# recordCough()
-# Create_spectogram.createWavelets(cough='cough.wav')
-# sendPrediction()
+if __name__ == '__main__':
+    get_resemblance_model()  # Loading the cough resemblance model
+    get_detection_model()  # Loading the cough detection model

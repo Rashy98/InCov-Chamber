@@ -1,21 +1,35 @@
-import sounddevice as sd
-from scipy.io.wavfile import write
+"""
+To record audio for cough component and Anosmia component
 
-fs = 44100
-seconds = 4
+"""
+
+# Importing needed libraries
+import sounddevice as sd
+
+
+fs = 44100  # Initialize sample rate
+seconds = 4  # Initialize number of seconds to record
+
 
 def recordCough():
-    print('-------------------recording-----------------')
+    """
+    Record audio for cough component
+    :return: recording: recording containing the cough audio of 4 seconds
+    """
     recording = sd.rec(int(seconds * fs), samplerate=fs, channels=1)
+
     sd.wait()
-    print('-------------------done----------------------')
+
     return recording
-    # write('./../../cough.wav', fs, recording)
+
 
 def recordAnosmia():
-    print('-------------------recording-----------------')
+    """
+    Record audio for cough component
+    :return: recording: recording containing the user response of 4 seconds
+    """
     recording = sd.rec(int(5 * fs), samplerate=fs, channels=1)
-    sd.wait()
-    print('-------------------done----------------------')
-    return recording
 
+    sd.wait()
+
+    return recording
