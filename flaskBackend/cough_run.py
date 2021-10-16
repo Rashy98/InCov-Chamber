@@ -122,6 +122,6 @@ def send_prediction():
     return response
 
 
-if __name__ == '__main__':
-    get_resemblance_model()  # Loading the cough resemblance model
-    get_detection_model()  # Loading the cough detection model
+# if __name__ == '__main__':
+get_resemblance_model()  # Loading the cough resemblance model
+get_detection_model()  # Loading the cough detection model

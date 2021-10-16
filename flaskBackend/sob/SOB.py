@@ -7,7 +7,8 @@
 """
 
 from imutils import face_utils
-from flaskBackend.logs import log_handler
+# from flaskBackend.logs import log_handler
+# from logs import log_handler
 import cv2 as cv
 import numpy as np
 import dlib
@@ -33,11 +34,11 @@ def resize_image(img):
         :param img: image to resize
         :return: resized image
     """
-
-    try:
-        return imutils.resize(image=img, width=width_500)
-    except AttributeError:
-        log_handler.log("sob", "CRITICAL", "resize_image", 38, "Cannot load the frame. Check for camera connection")
+    return imutils.resize(image=img, width=width_500)
+    # try:
+    #     return imutils.resize(image=img, width=width_500)
+    # except AttributeError:
+    #     log_handler.log("sob", "CRITICAL", "resize_image", 38, "Cannot load the frame. Check for camera connection")
 
 
 def highlight_roi(clone, shape):
@@ -107,8 +108,8 @@ def sob_run(cap0, cap1):
 
     while time.time() < time_end:
         # accepts frames from the cameras
-        is_true, cap0_frame = cap0.read()
-        is_true, cap1_frame = cap1.read()
+        is_true, cap0_frame = cap0.read()  # web camera
+        is_true, cap1_frame = cap1.read()  # thermal camera
 
         cap0_frame = resize_image(cap0_frame)
         cap1_frame = resize_image(cap1_frame)

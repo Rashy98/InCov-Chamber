@@ -3,7 +3,7 @@ import time
 import schedule
 
 def getSensorValue():
-    arduino = serial.Serial('COM6', 115200)
+    arduino = serial.Serial('COM5', 115200)
     print('Established serial connection to Arduino')
     arduino_data = arduino.readline()
 

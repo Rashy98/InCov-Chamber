@@ -112,7 +112,7 @@ class MainDashboard extends Component {
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevState.temperatureStatusDisplayed !== this.state.temperatureStatusDisplayed) {
 
-            // this.saveToDB()
+            this.saveToDB()
 
             if ((this.state.anosmiaStatus === "Normal") &&
                 (this.state.coughStatus === "Normal") &&
@@ -318,7 +318,7 @@ class MainDashboard extends Component {
 
                 var breathStatus = ''
 
-                if (12 <= (body.breathStatus * 2) <= 18) {
+                if (12 <= (body.breathStatus * 2) <= 20) {
                     breathStatus = 'Normal'
                 } else {
                     breathStatus = 'Unusual'
@@ -374,9 +374,9 @@ class MainDashboard extends Component {
                     coughLoaded: true
                 })
 
-                this.setDisplayState("coughDisplayed", "breathCountLoaded", 4000, 6000)
-                this.setDisplayState("breathCountDisplayed", "temperatureStatusLoaded", 8000, 10000)
-                this.setDisplayState("temperatureStatusDisplayed", null, 12000, null)
+                this.setDisplayState("coughDisplayed", "breathCountLoaded", 4000, 8000)
+                this.setDisplayState("breathCountDisplayed", "temperatureStatusLoaded", 10000, 12000)
+                this.setDisplayState("temperatureStatusDisplayed", null, 14000, null)
 
             });
         });

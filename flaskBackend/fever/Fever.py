@@ -2,6 +2,8 @@ from imutils import contours
 import numpy as np
 import imutils
 import cv2 as cv
+# from logs import log_handler
+# from flaskBackend.logs import log_handler
 
 # capture = cv.VideoCapture(1)
 OCR_B = cv.imread('./fever/OCR-B.jpg')
@@ -60,11 +62,18 @@ def getDigiCnts(group):
 
 def Fever_start(cap1):
     tot = 0
-    while tot == 0:
 
+    while tot == 0:
+    # while True:
         _, frame = cap1.read()
+
         frame = imutils.resize(image=frame, width=500)
-        cv.imshow('bgvfhdjk', frame)
+        # try:
+        #     frame = imutils.resize(image=frame, width=500)
+        # except AttributeError:
+        #     log_handler.log("fever", "CRITICAL", "fever_start", 68, "Cannot load the frame. Check for camera connection")
+
+        cv.imshow('temp', frame)
         frame = frame[:50, :88]
         frame_gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
@@ -94,7 +103,8 @@ def Fever_start(cap1):
 
         for (i, (gX, gY, gW, gH)) in enumerate(locs):
             groupOutput = []
-            group = frame_gray[gY - 5:gY + gH + 5, gX - 5:gX + gW + 5]
+            # group = frame_gray[gY - 5:gY + gH + 5, gX - 5:gX + gW + 5]
+            group = frame_gray[gY - 5:gY + gH + 2, gX - 5:gX + gW + 5]
 
             group = cv.threshold(group, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
 
@@ -104,13 +114,16 @@ def Fever_start(cap1):
                 (x, y, w, h) = cv.boundingRect(c)
                 roi = group[y:y + h, x:x + w]
                 roi = cv.resize(roi, (57, 88))
+
                 scores = []
 
                 for (digit, digitROI) in digits.items():
                     result = cv.matchTemplate(roi, digitROI, cv.TM_CCOEFF_NORMED)
                     (_, score, _, _) = cv.minMaxLoc(result)
                     scores.append(score)
+
                 groupOutput.append(str(np.argmax(scores)))
+
 
             cv.rectangle(frame, (gX - 5, gY - 5), (gX + gW + 5, gY + gH + 5), (0, 0, 255), 2)
             cv.putText(frame, "".join(groupOutput), (gX, gY - 15), cv.FONT_HERSHEY_SIMPLEX, 0.65, (0, 0, 255), 2)
@@ -123,6 +136,7 @@ def Fever_start(cap1):
 
         if cv.waitKey(20) & 0xFF == ord('q'):
             break
+
 
     print('Temperature ', tot)
     # capture.release()

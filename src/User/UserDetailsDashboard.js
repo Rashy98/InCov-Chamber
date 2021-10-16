@@ -8,7 +8,7 @@ import React, {useState, Component} from "react";
 import Loader from "react-loader-spinner";
 import {Redirect} from "react-router-dom";
 import logo from "../assets/Images/logo.png"
-import Background from "../assets/Images/NewBack1.jpg"
+import Background from "../assets/Images/NewBack2.png"
 
 
 //import "./assets/"
