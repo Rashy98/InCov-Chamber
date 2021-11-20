@@ -1,53 +1,44 @@
+"""
+    All methods to convert voice to text
+"""
+# Importing the needed library
 import speech_recognition as sr
-# filename = "./../../anosmia.wav"
-# initialize the recognizer
-# from flaskBackend.cough.AudioRecording import audioRecorder
-import numpy as np
-from scipy.io.wavfile import write,read
 
-# def recordSound():
-#     recording = audioRecorder.recordAnosmia()
-#     # write('anosmia.wav', 44100, recording)
-#
-#     y = (np.iinfo(np.int32).max * (recording / np.abs(recording).max())).astype(np.int32)
-#
-#     write('anosmia.wav', 44100, y)
-#
-#     text = voiceText('anosmia.wav')
-#     print(text)
-#     # return anosmiaChecker(text)
-#     # return 'Recording done'
-def voiceText(file):
+
+def voiceText(AudioRecording):
+    """
+        Method to convert audio response to text to Yes/No classification
+        :param AudioRecording: Recorded audio of the user response
+        :return: text : Converted text for Yes/No Classification
+    """
+
     r = sr.Recognizer()
-    # with sr.Microphone() as source:
-    # # read the audio data from the default microphone
-    #     audio_data = r.record(source, duration=5)
-    #     print("Recognizing...")
-    # # convert speech to text
-    #     text = r.recognize_google(audio_data)
-    #     return (text)
-    # open the file
-    with sr.AudioFile(file) as source:
+
+    with sr.AudioFile(AudioRecording) as source:
+
         # listen for the data (load audio to memory)
         r.adjust_for_ambient_noise(source)
         audio_data = r.record(source)
+
         # recognize (convert from speech to text)
         text = r.recognize_google(audio_data)
         print(text)
     return text
-# voiceText()
+
+
 def Frag():
-    print("Def ekk dammaaaaaaaa")
-    Mw = sr.Recognizer()
+    """
+        Method to convert audio response to text to fragrance type classification
+        :return: text : Converted text for fragrance type Classification
+    """
+    FragRecognizer = sr.Recognizer()
     with sr.Microphone() as source:
+
     # read the audio data from the default microphone
-        audio_data = Mw.record(source, duration=5)
+        audio_data = FragRecognizer.record(source, duration=5)
         print("Recognizing...")
+
     # convert speech to text
-        text = Mw.recognize_google(audio_data)
-        # text = "oh nooooo"
+        text = FragRecognizer.recognize_google(audio_data)
+
     return text
-# voiceText('anosmia.wav')
-# Frag()
-# recordSound()
-# Frag()
