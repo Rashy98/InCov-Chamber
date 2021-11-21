@@ -68,10 +68,11 @@ def Fever_start(cap1):
         _, frame = cap1.read()
 
         frame = imutils.resize(image=frame, width=500)
-        # try:
-        #     frame = imutils.resize(image=frame, width=500)
-        # except AttributeError:
-        #     log_handler.log("fever", "CRITICAL", "fever_start", 68, "Cannot load the frame. Check for camera connection")
+        try:
+            frame = imutils.resize(image=frame, width=500)
+        except AttributeError:
+            # log_handler.log("fever", "CRITICAL", "fever_start", 68, "Cannot load the frame. Check for camera connection")
+            pass
 
         cv.imshow('temp', frame)
         frame = frame[:50, :88]

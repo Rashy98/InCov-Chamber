@@ -14,17 +14,29 @@ import numpy as np
 import dlib
 import imutils
 import time
+import logging
 
 # initialize variables
 width_500 = 500
 width_250 = 250
 feature_start = 30
 feature_end = 36
+log_file_path = './logs/sob.log'
+log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
+shape_predictor_path = './sob/trainingModels/shape_predictor_68_face_landmarks.dat'
 
 # initialize dlib's face detector (HOG-based) and then create
 # the facial landmark predictor
 detector = dlib.get_frontal_face_detector()
-predictor = dlib.shape_predictor('./sob/trainingModels/shape_predictor_68_face_landmarks.dat')
+predictor = dlib.shape_predictor(shape_predictor_path)
+
+# initialize the logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler(log_file_path)
+formatter = logging.Formatter(log_format)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 
 def resize_image(img):
@@ -34,11 +46,13 @@ def resize_image(img):
         :param img: image to resize
         :return: resized image
     """
+
+    try:
+        return imutils.resize(image=img, width=width_500)
+    except AttributeError:
+        logger.critical("Cannot load the frame. Check for camera connection")
+
     return imutils.resize(image=img, width=width_500)
-    # try:
-    #     return imutils.resize(image=img, width=width_500)
-    # except AttributeError:
-    #     log_handler.log("sob", "CRITICAL", "resize_image", 38, "Cannot load the frame. Check for camera connection")
 
 
 def highlight_roi(clone, shape):
@@ -67,13 +81,6 @@ def get_nostril_area(frame, x, y, w, h):
     roi = imutils.resize(roi, width=width_250, inter=cv.INTER_CUBIC)
 
     return roi
-
-
-# def get_thermal_roi(frame, x, y, w, h):
-#     roi_thermal = frame[y:y + h, x:x + w]
-#     roi_thermal = imutils.resize(roi_thermal, width=width_250, inter=cv.INTER_CUBIC)
-#
-#     return roi_thermal
 
 
 def display_output(breath_count, roi_binary, roi, roi_thermal, clone, cap1_frame):
@@ -105,6 +112,8 @@ def sob_run(cap0, cap1):
     breath_count = 0
     previous_frame = 0
     time_end = time.time() + 30
+
+    logger.info("SOB Started")
 
     while time.time() < time_end:
         # accepts frames from the cameras
@@ -152,9 +161,11 @@ def sob_run(cap0, cap1):
             display_output(breath_count, roi_binary, roi_normal, roi_thermal, clone, cap1_frame)
 
         if cv.waitKey(20) & 0xFF == ord('q'):
+            logger.warning("Force Quit")
             break
 
     cv.destroyAllWindows()
 
+    logger.info("Breath Count " + str(breath_count))
     return breath_count
 
