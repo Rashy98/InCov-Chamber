@@ -37,11 +37,19 @@ def detection():
 
 @app.route("/anosmiaFrag", methods=["POST"])
 def anosmiaFrag():
+    """
+        API to run the fragrance type classification
+        :return: classified response
+    """
     return jsonify(anosmia_fragrance_classifier_run.anosmiaFragChecker())
 
 
 @app.route("/anosmia", methods=["GET", "POST"])
 def anosmia():
+    """
+        API to record the user response and to run the yes/no classification
+        :return: classified response
+    """
     return jsonify(anosmia_run.recordSound())
 
 
