@@ -9,7 +9,6 @@ from flask_cors import CORS
 import cough_run
 import anosmia_run
 import anosmia_fragrance_classifier_run
-from sob import SOB
 import camera_module_run
 
 app = Flask(__name__, static_url_path='', static_folder='./build')
@@ -24,11 +23,6 @@ def recordCough():
     """
     cough_recording_status = cough_run.record_cough()
     return cough_recording_status
-
-
-@app.route('/hello')
-def say_hello_world():
-    return {'result': "Hello World"}
 
 
 @app.route("/predictCough", methods=["GET", "POST"])
@@ -53,21 +47,21 @@ def anosmia():
 
 @app.route("/thermal_module", methods=["GET"])
 def sob():
+    """
+        API to run the temperature and SOB module
+
+        :return: the combined results of the both components
+    """
     return jsonify(camera_module_run.run_thermal_modules())
-
-
-@app.route("/get_temperature", methods=["GET"])
-def temperature():
-    return jsonify(camera_module_run.get_temperature())
-
-
-@app.route("/get_breath_count", methods=["GET"])
-def breath_count():
-    return jsonify(camera_module_run.get_breath_count())
 
 
 @app.route("/face_auth", methods=["GET"])
 def face_auth():
+    """
+        API to call the face authentication module
+
+        :return: identified person name
+    """
     return jsonify(camera_module_run.run_auth_module())
 
 

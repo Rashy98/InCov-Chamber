@@ -7,8 +7,6 @@
 """
 
 from imutils import face_utils
-# from flaskBackend.logs import log_handler
-# from logs import log_handler
 import cv2 as cv
 import numpy as np
 import dlib

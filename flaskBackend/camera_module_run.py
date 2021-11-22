@@ -4,11 +4,17 @@ from fever import Fever
 from sob import SOB
 from FaceRecognition import FaceRecog
 
+# create instances of web and thermal cameras
 cap0 = cv.VideoCapture(0)
 cap1 = cv.VideoCapture(1)
 
 
 def run_auth_module():
+    """
+        Runs the user authentication module
+
+        :return: authenticated user's name
+    """
     emp_name = FaceRecog.run_face_recog(cap0)
 
     result = {
@@ -19,6 +25,11 @@ def run_auth_module():
 
 
 def run_thermal_modules():
+    """
+        Runs the both temperature and SOB modules
+
+        :return: combined result of breath count and the temperature
+    """
     temperature = Fever.Fever_start(cap1)
     breath_count = SOB.sob_run(cap0, cap1)
 
@@ -28,26 +39,4 @@ def run_thermal_modules():
     }
 
     return result
-
-
-def get_temperature():
-    temperature = Fever.Fever_start(cap1)
-
-    result = {
-        'temperature': temperature
-    }
-    return result
-
-
-def get_breath_count():
-    breath_count = SOB.sob_run(cap0, cap1)
-
-    result = {
-        'breath_count': breath_count
-    }
-    return result
-
-
-def release_caps():
-    print('Caps released -------------------------------------------------------------------')
 
