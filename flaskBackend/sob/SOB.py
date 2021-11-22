@@ -81,17 +81,6 @@ def get_nostril_area(frame, x, y, w, h):
     return roi
 
 
-def display_output(breath_count, roi_binary, roi, roi_thermal, clone, cap1_frame):
-    display_text = ("Breath Count " + str(breath_count))
-    cv.putText(roi_binary, display_text, (10, 30), cv.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
-
-    cv.imshow("ROI Normal", roi)
-    cv.imshow("ROI Thermal", roi_thermal)
-    cv.imshow("ROI Binary", roi_binary)
-    cv.imshow("Clone", clone)
-    cv.imshow("Thermal", cap1_frame)
-
-
 def sob_run(cap0, cap1):
     """
         Starts the SOB component
@@ -155,8 +144,6 @@ def sob_run(cap0, cap1):
                     print('Breath Count ', breath_count)
 
                 previous_frame = 0
-
-            display_output(breath_count, roi_binary, roi_normal, roi_thermal, clone, cap1_frame)
 
         if cv.waitKey(20) & 0xFF == ord('q'):
             logger.warning("Force Quit")

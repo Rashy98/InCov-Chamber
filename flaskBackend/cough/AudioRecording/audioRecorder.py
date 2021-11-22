@@ -41,7 +41,7 @@ def recordCough():
 
 def recordAnosmia():
     """
-        Record audio for cough component
+        Record audio for anosmia component
         :return: recording: recording containing the user response of 4 seconds
     """
     recording = sd.rec(int(5 * fs), samplerate=fs, channels=1)
