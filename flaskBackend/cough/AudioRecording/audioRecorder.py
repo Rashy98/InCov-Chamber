@@ -11,7 +11,7 @@ fs = 44100  # Initialize sample rate
 seconds = 4  # Initialize number of seconds to record
 
 # initializing log related variables
-log_file_path = '../../logs/cough.log'
+log_file_path = './logs/cough.log'
 log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
 
 # initialize the logger

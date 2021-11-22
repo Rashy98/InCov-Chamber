@@ -24,16 +24,16 @@ categories = ['healthy', 'positive']  # Define categories for cough resemblance
 detect_categories = ['coughing', 'non-cough']  # Define categories for cough detection
 
 # initializing log related variables
-# log_file_path = 'logs/cough.log'
-# log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
+log_file_path = './logs/cough.log'
+log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
 
 # initialize the logger
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
-# file_handler = logging.FileHandler(log_file_path)
-# formatter = logging.Formatter(log_format)
-# file_handler.setFormatter(formatter)
-# logger.addHandler(file_handler)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler(log_file_path)
+formatter = logging.Formatter(log_format)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 
 def record_cough():
@@ -42,7 +42,7 @@ def record_cough():
         :returns recording_status
     """
 
-    # logger.info('Cough component started.')
+    logger.info('Cough component started.')
 
     recording = audioRecorder.recordCough()
     write('cough.wav', 44100, recording)
@@ -135,6 +135,6 @@ def send_prediction():
     return response
 
 
-# if __name__ == '__main__':
 get_resemblance_model()  # Loading the cough resemblance model
 get_detection_model()  # Loading the cough detection model
+record_cough()
