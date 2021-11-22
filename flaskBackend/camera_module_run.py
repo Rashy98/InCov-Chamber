@@ -51,4 +51,3 @@ def get_breath_count():
 def release_caps():
     print('Caps released -------------------------------------------------------------------')
 
-# run_thermal_modules()

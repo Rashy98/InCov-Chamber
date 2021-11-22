@@ -137,4 +137,3 @@ def send_prediction():
 
 get_resemblance_model()  # Loading the cough resemblance model
 get_detection_model()  # Loading the cough detection model
-record_cough()

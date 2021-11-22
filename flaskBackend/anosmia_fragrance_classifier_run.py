@@ -14,16 +14,16 @@ import anosmia_run
 status = ""
 
 # initializing log related variables
-# log_file_path = './logs/anosmia.log'
-# log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
+log_file_path = './logs/anosmia.log'
+log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
 
 # initialize the logger
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
-# file_handler = logging.FileHandler(log_file_path)
-# formatter = logging.Formatter(log_format)
-# file_handler.setFormatter(formatter)
-# logger.addHandler(file_handler)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler(log_file_path)
+formatter = logging.Formatter(log_format)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
 
 def anosmiaFragChecker():
     """
@@ -32,7 +32,7 @@ def anosmiaFragChecker():
     """
 
     arduinoValue = anosmia_run.getArduinoValue()
-    # logger.info('Current Fragrance Level '+ arduinoValue)
+    logger.info('Current Fragrance Level '+ arduinoValue)
 
     # initializing the directory containing the training data
     dataFrag = pd.read_csv('./Anosmia/fragrance_type_classifier/smellNameList.txt', delimiter=",")

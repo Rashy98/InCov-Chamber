@@ -7,7 +7,6 @@ import React from 'react';
 import {HashRouter as Router, Route} from "react-router-dom";
 
 // importing other components
-import DetailedDashboard from "./Common/DetailedDashboard";
 import UserDetailsDashboard from "./User/UserDetailsDashboard";
 import MainDashboard from "./User/MainDashboard";
 import landingApp from "./User/landingApp";
@@ -20,7 +19,6 @@ function App() {
 
             <switch>
                 <Route path="/" exact component={landingApp}/>
-                <Route  path='/detailed' exact component={DetailedDashboard}/>
                 <Route path='/UserDetailsDashboard' exact component={UserDetailsDashboard}/>
                 <Route path='/MainDashboard' exact component={MainDashboard}/>
                 <Route path='/FinalPage' exact component={FinalPage}/>
