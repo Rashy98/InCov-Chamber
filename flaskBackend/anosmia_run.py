@@ -8,6 +8,7 @@ from flask_cors import CORS
 import pandas as pd
 import numpy as np
 import pickle
+import logging
 from Anosmia.voice_to_text import voice_to_text
 from Anosmia.arduino import arduino_value
 from Anosmia.yes_no_classifier import util_classifier
@@ -18,12 +19,26 @@ from scipy.io.wavfile import write
 status = ""
 arduinoValue = 0
 
+# initializing log related variables
+# log_file_path = './logs/anosmia.log'
+# log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
+
+# initialize the logger
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.INFO)
+# file_handler = logging.FileHandler(log_file_path)
+# formatter = logging.Formatter(log_format)
+# file_handler.setFormatter(formatter)
+# logger.addHandler(file_handler)
+
 
 def recordSound():
     """
         Method to record user response and convert it into text
         :return: convertedText
     """
+    # logger.info('Anosmia component started.')
+
     recording = audioRecorder.recordAnosmia()
     y = (np.iinfo(np.int32).max * (recording / np.abs(recording).max())).astype(np.int32)
     write('anosmia.wav', 44100, y)
