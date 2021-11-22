@@ -1,27 +1,59 @@
+"""
+    This module will detect the high body temperature of a person
+"""
+
+# import needed libraries
 from imutils import contours
 import numpy as np
 import imutils
 import cv2 as cv
-# from logs import log_handler
-# from flaskBackend.logs import log_handler
+import logging
 
-# capture = cv.VideoCapture(1)
+log_file_path = './logs/sob.log'
+log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
+
 OCR_B = cv.imread('./fever/OCR-B.jpg')
 
+
+# initialize the logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+file_handler = logging.FileHandler(log_file_path)
+formatter = logging.Formatter(log_format)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+
 def getReference():
+    """
+        Using and configuring the reference image that is for Optical Character Recognition as needed
+        :return:ref: Configured reference image
+    """
     ref = cv.cvtColor(OCR_B, cv.COLOR_BGR2GRAY)
     ref = cv.threshold(ref, 10, 255, cv.THRESH_BINARY_INV)[1]
 
     return ref
 
 def getRefCnts(ref):
+    """
+
+        :param ref: Configured reference image using the 'getReference()' method
+        :return: refCnts:
+    """
     refCnts = cv.findContours(ref.copy(), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     refCnts = imutils.grab_contours(refCnts)
     refCnts = contours.sort_contours(refCnts, method="left-to-right")[0]
-
     return refCnts
 
+
 def getDigits(refCnts, ref, digits):
+    """
+
+        :param refCnts:
+        :param ref: Configured reference image using the 'getReference()' method
+        :param digits: Empty array used to store the created digits
+        :return: digits
+    """
     for (i, c) in enumerate(refCnts):
         (x, y, w, h) = cv.boundingRect(c)
         roi = ref[y:y + h, x:x + w]
@@ -61,17 +93,21 @@ def getDigiCnts(group):
     return digitCnts
 
 def Fever_start(cap1):
+    """
+        Reading the thermal image to obtain the characters (temperature)
+        :param cap1: camera instance for thermal camera
+        :return: tot: Final temperature after getting the average of 10 read values
+    """
     tot = 0
 
     while tot == 0:
-    # while True:
         _, frame = cap1.read()
 
         frame = imutils.resize(image=frame, width=500)
         try:
             frame = imutils.resize(image=frame, width=500)
         except AttributeError:
-            # log_handler.log("fever", "CRITICAL", "fever_start", 68, "Cannot load the frame. Check for camera connection")
+            logger.critical("Cannot load the frame. Check for camera connection")
             pass
 
         cv.imshow('temp', frame)
@@ -132,7 +168,6 @@ def Fever_start(cap1):
 
             output[2] = '.'
             temp = float("".join(output))
-            # print(temp)
             tot = tot + temp
 
         if cv.waitKey(20) & 0xFF == ord('q'):
@@ -140,9 +175,6 @@ def Fever_start(cap1):
 
 
     print('Temperature ', tot)
-    # capture.release()
+
     cv.destroyAllWindows()
     return tot
-    #check
-
-# Fever_start()

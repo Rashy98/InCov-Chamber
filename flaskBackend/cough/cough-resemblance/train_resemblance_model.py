@@ -1,5 +1,5 @@
 """
-To train the cough resemblance model - VGG16
+    To train the cough resemblance model - VGG16
 """
 
 # Importing needed libraries
@@ -57,9 +57,9 @@ train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy
 @tf.function
 def train_step(features, resemblance_labels):
     """
-    Training the model
-    :param features: training spectrogram
-    :param resemblance_labels: labels of the training dataset
+        Training the model
+        :param features: training spectrogram
+        :param resemblance_labels: labels of the training dataset
     """
     with tf.GradientTape() as tape:
         predictions = model(features, training=True)

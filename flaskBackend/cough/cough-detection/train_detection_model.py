@@ -55,7 +55,7 @@ def train_step(features_detect, detection_label):
        Training the model
        :param features_detect: training spectrogram
        :param detection_label: labels of the training dataset
-       """
+    """
     with tf.GradientTape() as tape:
         predictions = model(features_detect, training=True)
         loss = loss_object(y_true=detection_label, y_pred=predictions)

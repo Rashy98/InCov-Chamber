@@ -1,5 +1,5 @@
 """
-To test the cough detection model
+    To test the cough detection model
 """
 
 # Importing the needed libraries
@@ -43,8 +43,8 @@ def get_classification_report_cough_detection():
 
 def plot_spectrogram_for_testing():
     """
-    Make predictions for the testing dataset with the trained model for the 1st 10 spectrogram to
-    plot the classifications
+        Make predictions for the testing dataset with the trained model for the 1st 10 spectrogram to
+        plot the classifications
     """
 
     prediction = detection_model(x_test[0:9])

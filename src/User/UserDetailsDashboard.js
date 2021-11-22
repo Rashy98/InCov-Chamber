@@ -1,43 +1,27 @@
+/*
+    Component that displays user details after recognizing the person
+*/
+
+//importing needed libraries
+import React, {Component} from "react";
+import Loader from "react-loader-spinner";
+import {Redirect} from "react-router-dom";
+import axios from "axios";
+import {
+    Card,
+    CardBody,
+    CardText,
+} from "reactstrap";
+
+//importing assets
 import '../App.css';
 import "../assets/scss/black-dashboard-react.scss";
 import "../assets/css/nucleo-icons.css";
 import "../assets/scss/black-dashboard-react/custom/cards/_card-border.scss"
-// import ReactCardFlip from "react-card-flip";
-// import ReactDOM from "react-dom";
-import React, {useState, Component} from "react";
-import Loader from "react-loader-spinner";
-import {Redirect} from "react-router-dom";
 import logo from "../assets/Images/logo.png"
 import Background from "../assets/Images/NewBack2.png"
 
 
-//import "./assets/"
-
-
-import {
-    Button,
-    ButtonGroup,
-    Card,
-    CardHeader,
-    CardBody,
-    CardTitle,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    UncontrolledDropdown,
-    Label,
-    FormGroup,
-    Input,
-    Table,
-    Row,
-    Col,
-    CardFooter,
-    CardText,
-
-    Form,
-    UncontrolledTooltip,
-} from "reactstrap";
-import axios from "axios";
 
 
 class UserDetailsDashboard extends Component {
@@ -46,6 +30,7 @@ class UserDetailsDashboard extends Component {
         super(props);
 
         this.state = {
+
             employees: [],
             isLoading: true,
             name: "",
@@ -61,6 +46,7 @@ class UserDetailsDashboard extends Component {
         this.getEmployees();
     }
 
+    // Setting a timeout for 5s
     timeOutFn(emp) {
         setTimeout(() => {
             this.setState({
@@ -70,6 +56,7 @@ class UserDetailsDashboard extends Component {
         }, 5000)
     }
 
+    // Retrieving the user details that is inside the chamber
     getEmployees() {
         axios({
             method: 'post',
@@ -79,7 +66,6 @@ class UserDetailsDashboard extends Component {
                 empID: this.props.location.state.id, // This is the body part
             }
         }).then(res => {
-            // console.log(res.data.result.fullName);
             this.setState({
                 employees: res.data.result,
                 name: res.data.result.fullName,
@@ -93,31 +79,21 @@ class UserDetailsDashboard extends Component {
 
     }
 
+
+    // Rendering method
     render() {
 
         return (
             <div className="App" style={{backgroundColor: "white", backgroundImage : `url(${Background})`, backgroundPosition : "center", backgroundRepeat: "no-repeat", backgroundSize : "cover"}}>
                 <Card className="card-user"
                       style={{
-                          // border : "5px solid black",
                           width: "40%",
-                          // height : "50em",
                           marginLeft: "auto",
                           marginRight: "auto"
                       }}>
                     <CardBody>
                         <CardText/>
-                        <div className="author"  //bb is the custom scss file
-                             // style={{
-                             //     border: "5px solid #013a55",
-                             //     width: "80%",
-                             //     minHeight: "40%",
-                             //     marginLeft: "auto",
-                             //     marginRight: "auto",
-                             //     alignContent: "center",
-                             //     borderRadius: "5%"
-                             // }}
-                        >
+                        <div className="author">
                             <a href="#pablo" onClick={(e) => e.preventDefault()}>
                                 {
                                     this.state.imgLoaded ?
@@ -128,7 +104,6 @@ class UserDetailsDashboard extends Component {
                                         />
                                         :
                                         <img
-                                            // className="avatar"
                                             style={{marginTop: "8%",  width: "300px", height: "300px", marginLeft: "2.4%"}}
                                             src={logo}
                                         />
@@ -146,7 +121,7 @@ class UserDetailsDashboard extends Component {
                                 color="#00BFFF"
                                 height={50}
                                 width={50}
-                                timeout={60000} //30 secs
+                                timeout={60000} //30min secs timeout
                                 style ={{marginBottom : "5%"}}
                             />
                         </div>
@@ -166,7 +141,8 @@ class UserDetailsDashboard extends Component {
                                         />
                                         )
                                     </div>
-                                    : ""
+                                    :
+                                    ""
                                 }
                             </div>
                         }

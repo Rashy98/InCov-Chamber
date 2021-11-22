@@ -1,5 +1,5 @@
 """
-To process and make the data needed for training and testing for cough resemblance
+    To process and make the data needed for training and testing for cough resemblance
 """
 
 # Importing needed libraries
@@ -18,7 +18,7 @@ data = []  # global variable to store the data
 
 def make_data():
     """
-    Build the data for the cough resemblance model and saving the pickle file
+        Build the data for the cough resemblance model and saving the pickle file
     """
     for category in categories:
         path = os.path.join(data_dir, category)

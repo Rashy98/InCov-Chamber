@@ -6,12 +6,11 @@
 from cough.AudioRecording import audioRecorder
 from cough.CreateSpectogram import Create_spectogram
 from keras.preprocessing import image
-from keras.preprocessing.image import img_to_array
-from keras.layers import Layer
 from scipy.io.wavfile import write
 import numpy as np
 import os
 import tensorflow as tf
+import logging
 
 # initializing path to the cough resemblance model path
 resemblance_model_path = 'cough/cough-resemblance/myVggCoughResModel.h5'
@@ -21,9 +20,20 @@ detection_model_path = 'cough/cough-detection/myVggCoughDetectionModel.h5'
 
 # initializing path to the spectrogram
 spectrogram_path = './spectograms/spectogram.png'
-
 categories = ['healthy', 'positive']  # Define categories for cough resemblance
 detect_categories = ['coughing', 'non-cough']  # Define categories for cough detection
+
+# initializing log related variables
+# log_file_path = 'logs/cough.log'
+# log_format = '%(asctime)s : %(levelname)s : %(funcName)s : %(lineno)d : %(message)s'
+
+# initialize the logger
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.INFO)
+# file_handler = logging.FileHandler(log_file_path)
+# formatter = logging.Formatter(log_format)
+# file_handler.setFormatter(formatter)
+# logger.addHandler(file_handler)
 
 
 def record_cough():
@@ -31,6 +41,9 @@ def record_cough():
         Method to record audio and to convert the recorded audio into a spectrogram
         :returns recording_status
     """
+
+    # logger.info('Cough component started.')
+
     recording = audioRecorder.recordCough()
     write('cough.wav', 44100, recording)
 

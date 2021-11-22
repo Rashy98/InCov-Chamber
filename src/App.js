@@ -1,6 +1,12 @@
+/*
+    Main component which configure the paths for each component
+*/
+
+// importing needed libraries
 import React from 'react';
 import {HashRouter as Router, Route} from "react-router-dom";
-import Dashboard from "./Common/Dashboard";
+
+// importing other components
 import DetailedDashboard from "./Common/DetailedDashboard";
 import UserDetailsDashboard from "./User/UserDetailsDashboard";
 import MainDashboard from "./User/MainDashboard";
@@ -14,7 +20,6 @@ function App() {
 
             <switch>
                 <Route path="/" exact component={landingApp}/>
-                {/*<Route path="/" exact component={FinalPage}/>*/}
                 <Route  path='/detailed' exact component={DetailedDashboard}/>
                 <Route path='/UserDetailsDashboard' exact component={UserDetailsDashboard}/>
                 <Route path='/MainDashboard' exact component={MainDashboard}/>

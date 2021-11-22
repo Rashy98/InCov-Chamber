@@ -1,45 +1,36 @@
+/*
+    Dashboard displaying all results.
+*/
+
+// importing needed libraries
 import React, {Component} from "react";
 import FlipCard from "./flipCard";
-import {AnimatePresence, motion} from 'framer-motion';
+import {motion} from 'framer-motion';
+import {withRouter} from "react-router-dom";
+import axios from "axios";
 
+
+// importing assets
+import '../App.css';
+import "../assets/scss/black-dashboard-react.scss";
+import "../assets/css/nucleo-icons.css";
+import Logo from "../assets/Images/logo3.png";
 import welcome_audio from './../sound/welcome.wav';
 import anosmia01 from './../sound/anosmia01.wav';
 import anosmia02 from './../sound/anosmia02.wav';
 import ask_to_cough from './../sound/ask_to_cough.wav';
-import thank_you_audio from './../sound/ThankYou.wav'
-import cough_audio from './../sound/Cough.wav'
-import no_cough_audio from './../sound/NonCough.wav'
+import no_cough_audio from './../sound/NonCough.wav';
 
-import '../App.css';
-import "../assets/scss/black-dashboard-react.scss";
-import "../assets/css/nucleo-icons.css";
-import Logo from "../assets/Images/logo3.png"
 
 import {
-    Button,
-    ButtonGroup,
     Card,
     CardHeader,
     CardBody,
-    CardTitle,
-    DropdownToggle,
-    DropdownMenu,
-    DropdownItem,
-    UncontrolledDropdown,
-    Label,
-    FormGroup,
-    Input,
-    Table,
     Row,
     Col,
-    CardFooter,
     CardText,
-
-    Form,
-    UncontrolledTooltip,
-} from "reactstrap";
-import {Redirect, withRouter} from "react-router-dom";
-import axios from "axios";
+}
+from "reactstrap";
 
 
 class MainDashboard extends Component {
@@ -47,31 +38,41 @@ class MainDashboard extends Component {
         super(props);
 
         this.state = {
+
+            // State values for the Anosmia Detection component
             anosmia_classifier_value: '',
+            anosmiaStatus: '',
+            anosmiaLoaded: false,
+            anosmiaDisplayed: false,
+
+            // State values for the Shortness of Breath Detection component
+            breathStatus: 0,
+            breathCountLoaded: false,
+            breathCountDisplayed: false,
+
+            // State values for the Cough Analysis component
+            coughStatus: '',
+            coughLoaded: false,
+            coughDisplayed: false,
             recordingStatus: '',
             predictPercentage: 0,
 
-            anosmiaStatus: '',
-            coughStatus: '',
+            // State values for the High body temperature Detection component
             temperatureStatus: 0,
-            breathStatus: 0,
-            heartRate: 0,
-
-            thermalModuleLoaded: false,
             temperatureStatusLoaded: false,
-            breathCountLoaded: false,
-            coughLoaded: false,
-            anosmiaLoaded: false,
-            heartRateLoaded: false,
-
-            anosmiaDisplayed: false,
-            coughDisplayed: false,
-            breathCountDisplayed: false,
             temperatureStatusDisplayed: false,
+
+            // State values used by both High body temperature Detection and Shortness of Breath Detection components
+            thermalModuleLoaded: false,
+
+            // State values for the Heart rate Detection component
+            heartRate: 0,
             heartRateDisplayed: false,
+            heartRateLoaded: false,
 
             isSafe: false
         }
+
         this.soundCommand = this.soundCommand.bind(this)
         this.AnosmiaGetData = this.AnosmiaGetData.bind(this)
         this.PlayCoughSaying = this.PlayCoughSaying.bind(this)
@@ -90,6 +91,7 @@ class MainDashboard extends Component {
         this.saveToDB = this.saveToDB.bind(this)
     }
 
+
     async componentDidMount() {
 
         await this.handleAudio(welcome_audio)
@@ -97,17 +99,8 @@ class MainDashboard extends Component {
         this.thermal_module()
         this.get_heartRate()
 
-        // this.audio = new Audio(welcome_audio)
-        // this.audio.load()
-        // this.playAudio()
-        // const audioEl = document.getElementsByClassName("audio-element")[0]
-        // audioEl.play()
-        // this.get_temperatureStatus()
-        // setTimeout(function (){
-        //     this.get_breathStatus()
-        // }.bind(this), 2000)
-
     }
+
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         if (prevState.temperatureStatusDisplayed !== this.state.temperatureStatusDisplayed) {
@@ -132,10 +125,11 @@ class MainDashboard extends Component {
         }
     }
 
+    // Plays the audio instruction for the Anosmia component
     soundCommand() {
         setTimeout(this.AnosmiaGetData, 8000);
-        // setTimeout(this.PlayCoughSaying, 20000);
     }
+
 
     async handleAudio(audio) {
         this.audio = new Audio(audio)
@@ -143,6 +137,8 @@ class MainDashboard extends Component {
         this.playAudio()
     }
 
+
+    // Plays the welcoming audio
     playAudio() {
         const audioPromise = this.audio.play()
         if (audioPromise !== undefined) {
@@ -157,12 +153,10 @@ class MainDashboard extends Component {
         }
     }
 
+
+    // Performs Anosmia component's processes
     async AnosmiaGetData() {
         await this.handleAudio(anosmia01)
-
-        // this.audio = new Audio(anosmia01)
-        // this.audio.load()
-        // this.playAudio()
 
         setTimeout(fetch('/anosmia', {
             method: 'GET',
@@ -176,7 +170,6 @@ class MainDashboard extends Component {
                     this.setState({
                         anosmia_classifier_value: body.classifier_value,
                     })
-
 
                     if (body.classifier_value === 'yes') {
                         // setTimeout(this.getAnosmiaFragrance(), 2000)
@@ -211,11 +204,9 @@ class MainDashboard extends Component {
 
     }
 
+    // Performs Anosmia component's processes
     getAnosmiaFragrance() {
         this.handleAudio(anosmia02)
-        // this.audio = new Audio(anosmia02)
-        // this.audio.load()
-        // this.playAudio()
 
         fetch('/anosmiaFrag', {
             method: 'POST',
@@ -235,29 +226,24 @@ class MainDashboard extends Component {
                     anosmiaDisplayed: true
                 })
 
-                // setTimeout(this.PlayCoughSaying('init'), 4000)
                 this.PlayCoughSaying('init')
             });
         });
     }
 
+    // Plays the audio instruction for the Cough analysis component
     PlayCoughSaying(position) {
-        console.log('hfuvid')
         if (position === 'init') {
             this.handleAudio(ask_to_cough)
-            // this.audio = new Audio(ask_to_cough)
-            // this.audio.load()
-            // this.playAudio()
+
         } else {
             this.handleAudio(no_cough_audio)
-            // this.audio = new Audio(no_cough_audio)
-            // this.audio.load()
-            // this.playAudio()
         }
-
         setTimeout(this.CoughRecording, 4200);
     }
 
+
+    // Records cough audio
     CoughRecording() {
         fetch('/recordCough', {
             method: 'GET',
@@ -273,6 +259,8 @@ class MainDashboard extends Component {
         setTimeout(this.getCoughPrediction, 8000)
     }
 
+
+    //  Gets the shortness of breath and temperature values
     thermal_module() {
         fetch('thermal_module', {
             method: 'GET'
@@ -298,6 +286,7 @@ class MainDashboard extends Component {
         })
     }
 
+    // Determine the temperature status - temperature
     get_temperatureStatus() {
         fetch('get_temperatureStatus', {
             method: 'GET'
@@ -310,6 +299,7 @@ class MainDashboard extends Component {
         })
     }
 
+    // Determine the shortness of breath status - breath count
     get_breathStatus() {
         fetch('get_breathStatus', {
             method: 'GET'
@@ -324,13 +314,11 @@ class MainDashboard extends Component {
                     breathStatus = 'Unusual'
                 }
 
-                // this.setState({
-                //     breathStatus: breathStatus
-                // })
             })
         })
     }
 
+    // Retrieve heart rate from the database according to the user inside the chamber
     get_heartRate() {
         axios({
             method: 'post',
@@ -349,6 +337,8 @@ class MainDashboard extends Component {
         });
     }
 
+
+    // Determine the cough component's status after analysing the audio - Usual/ Non-Usual
     getCoughPrediction() {
         let value = '';
         fetch('/predictCough', {
@@ -382,6 +372,7 @@ class MainDashboard extends Component {
         });
     }
 
+    // Flipping cards for each symptom
     displayFlipCard(condition1, condition2, compName, compValue) {
         if (condition1) {
             if (condition2) {
@@ -401,6 +392,7 @@ class MainDashboard extends Component {
 
     }
 
+     // Display status
     setDisplayState(state1, state2, timeOut1, timeOut2) {
         setTimeout(function () {
                 this.setState({
@@ -422,6 +414,7 @@ class MainDashboard extends Component {
 
     }
 
+     // Send final results to the database
     saveToDB() {
 
         let date = new Date()
@@ -431,7 +424,6 @@ class MainDashboard extends Component {
         axios({
             method: 'post',
             url: "https://incovbackend.herokuapp.com/employee/pushDailyReadings",
-            // url: "http://localhost:7000/employee/pushDailyReadings",
             headers: {},
             data: {
                 empID : this.props.location.state.employee.empID,
@@ -447,15 +439,12 @@ class MainDashboard extends Component {
         })
     }
 
+
+    // Rendering method
     render() {
         return (
             <div className="App" style={{marginBottom: "-3%"}}>
                 <Row>
-                    {/*<div>*/}
-                    {/*    <audio className="audio-element">*/}
-                    {/*        <source src={audio}></source>*/}
-                    {/*    </audio>*/}
-                    {/*</div>*/}
                     <Col xs="12">
                         <Card className="card-chart">
                             <CardHeader>
@@ -475,8 +464,12 @@ class MainDashboard extends Component {
                                                         />
                                                     </Row>
                                                     <Row>
-                                                        <a href="#pablo" onClick={(e) => e.preventDefault()}
+                                                        <a href="#pablo"
+                                                           onClick={(e) => e.preventDefault()}
                                                            style={{marginLeft: "23%", marginTop: "-15%"}}>
+
+                                                            {/*Displays the photo of the user inside the chamber*/}
+
                                                             <img
                                                                 alt="..."
                                                                 className="avatar"
@@ -488,8 +481,11 @@ class MainDashboard extends Component {
                                                                     height: "16em"
                                                                 }}
                                                             />
-                                                            <h2 className="title" style={{marginBottom: "2%", color : "#00aa86"}}>{this.props.location.state.employee.fullName}</h2>
-                                                            <h2 className="description" style={{color : "black"}}>{this.props.location.state.employee.position}</h2>
+                                                             {/*Displays the details of the user inside the chamber*/}
+                                                            <h2 className="title" style={{marginBottom: "2%",
+                                                                color : "#00aa86"}}>{this.props.location.state.employee.fullName}</h2>
+                                                            <h2 className="description"
+                                                                style={{color : "black"}}>{this.props.location.state.employee.position}</h2>
                                                         </a>
 
                                                     </Row>
@@ -500,70 +496,37 @@ class MainDashboard extends Component {
                                         </Card>
                                     </Col>
                                     <Col sm={8}>
-                                        {/*<Row style={{ width: '90%', height: '10%', marginLeft:"5%" }}>*/}
                                         <Col lg="2.9">
                                             <motion.div
                                                 initial={{scaleY: 0}}
                                                 animate={{scaleY: 1}}
-                                                // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
                                                 {this.displayFlipCard(true, this.state.heartRateLoaded, "Heart Rate", this.state.heartRate)}
-                                                {/*{this.state.breathCountDisplayed ?*/}
-                                                {/*    <div>*/}
-                                                {/*        {this.state.temperatureStatusLoaded ?*/}
-                                                {/*            <FlipCard componentName="Body temperatureStatus"*/}
-                                                {/*                      currentStatus="Yet to Begin"*/}
-                                                {/*                      componentValue={this.state.temperatureStatus}*/}
-                                                {/*                      flipped={true}/> :*/}
-                                                {/*            <FlipCard componentName="Body temperatureStatus"*/}
-                                                {/*                      currentStatus="Yet to Begin"*/}
-                                                {/*                      componentValue="Un Normal" flipped={false}/>*/}
-                                                {/*        }*/}
-                                                {/*    </div>*/}
-                                                {/*    : ""*/}
-                                                {/*}*/}
                                             </motion.div>
                                         </Col>
                                         <Col lg="2.9">
                                             <motion.div
                                                 initial={{scaleY: 0}}
                                                 animate={{scaleY: 1}}
-                                                // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(this.state.heartRateDisplayed, this.state.anosmiaLoaded, "Smell Level", this.state.anosmiaStatus)}
-                                                {/*{this.state.anosmiaLoaded ?*/}
+                                                {this.displayFlipCard(this.state.heartRateDisplayed,
+                                                    this.state.anosmiaLoaded, "Smell Level",
+                                                    this.state.anosmiaStatus)}
 
-                                                {/*    <FlipCard componentName="Smell Level" currentStatus="Yet to Begin"*/}
-                                                {/*              componentValue="Normal" flipped={true}/>*/}
-                                                {/*    :*/}
-                                                {/*    <FlipCard componentName="Smell Level" currentStatus="Yet to Begin"*/}
-                                                {/*              componentValue="Not Normal" flipped={false}/>*/}
-                                                {/*}*/}
                                             </motion.div>
                                         </Col>
-                                        {/*</Row>*/}
 
-                                        {/*<Row style={{marginLeft: "13%", marginTop: "5%"}}>*/}
                                         <Col lg="2.9">
                                             <motion.div
                                                 initial={{scaleY: 0}}
                                                 animate={{scaleY: 1}}
-                                                // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(this.state.anosmiaDisplayed, this.state.coughLoaded, "Cough", this.state.coughStatus)}
-                                                {/*{this.state.anosmiaDisplayed ?*/}
-                                                {/*    <div>*/}
-                                                {/*        /!*{this.state.coughLoaded ?*!/*/}
-                                                {/*        /!*    <FlipCard componentName="Cough" currentStatus="Yet to Begin"*!/*/}
-                                                {/*        /!*              componentValue="Normal" flipped={true}/> :*!/*/}
-                                                {/*        /!*    <FlipCard componentName="Cough" currentStatus="Yet to Begin"*!/*/}
-                                                {/*        /!*              componentValue="Un Normal" flipped={false}/>}*!/*/}
-                                                {/*    </div>*/}
-                                                {/*    : ""*/}
-                                                {/*}*/}
+                                                {this.displayFlipCard(this.state.anosmiaDisplayed,
+                                                    this.state.coughLoaded, "Cough", this.state.coughStatus)}
+
                                             </motion.div>
 
                                         </Col>
@@ -572,24 +535,12 @@ class MainDashboard extends Component {
                                             <motion.div
                                                 initial={{scaleY: 0}}
                                                 animate={{scaleY: 1}}
-                                                // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(this.state.coughDisplayed, this.state.breathCountLoaded, "Breath Count", this.state.breathStatus)}
-                                                {/*{this.state.coughDisplayed ?*/}
-                                                {/*    <div>*/}
-                                                {/*        {this.state.breathCountLoaded ?*/}
-                                                {/*            <FlipCard componentName="Breathing Count"*/}
-                                                {/*                      currentStatus="Yet to Begin"*/}
-                                                {/*                      componentValue={this.state.breathStatus}*/}
-                                                {/*                      flipped={true}/> :*/}
-                                                {/*            <FlipCard componentName="Breathing Count"*/}
-                                                {/*                      currentStatus="Yet to Begin"*/}
-                                                {/*                      componentValue="Un Normal" flipped={false}/>*/}
-                                                {/*        }*/}
-                                                {/*    </div>*/}
-                                                {/*    : ""*/}
-                                                {/*}*/}
+                                                {this.displayFlipCard(this.state.coughDisplayed,
+                                                    this.state.breathCountLoaded, "Breath Count",
+                                                    this.state.breathStatus)}
+
 
                                             </motion.div>
                                         </Col>
@@ -597,44 +548,14 @@ class MainDashboard extends Component {
                                             <motion.div
                                                 initial={{scaleY: 0}}
                                                 animate={{scaleY: 1}}
-                                                // exit={{scaleY: 0}}
                                                 transition={{duration: 0.5}}
                                             >
-                                                {this.displayFlipCard(this.state.breathCountDisplayed, this.state.temperatureStatusLoaded, "Temperature", this.state.temperatureStatus)}
-                                                {/*{this.state.breathCountDisplayed ?*/}
-                                                {/*    <div>*/}
-                                                {/*        {this.state.temperatureStatusLoaded ?*/}
-                                                {/*            <FlipCard componentName="Body temperatureStatus"*/}
-                                                {/*                      currentStatus="Yet to Begin"*/}
-                                                {/*                      componentValue={this.state.temperatureStatus}*/}
-                                                {/*                      flipped={true}/> :*/}
-                                                {/*            <FlipCard componentName="Body temperatureStatus"*/}
-                                                {/*                      currentStatus="Yet to Begin"*/}
-                                                {/*                      componentValue="Un Normal" flipped={false}/>*/}
-                                                {/*        }*/}
-                                                {/*    </div>*/}
-                                                {/*    : ""*/}
-                                                {/*}*/}
+                                                {this.displayFlipCard(this.state.breathCountDisplayed,
+                                                    this.state.temperatureStatusLoaded, "Temperature",
+                                                    this.state.temperatureStatus)}
+
                                             </motion.div>
                                         </Col>
-                                        {/*<Col lg="2.9">*/}
-                                        {/*    <FlipCard componentName="Pulse Rate" currentStatus="Yet to Begin"*/}
-                                        {/*              componentValue="160"/>*/}
-                                        {/*</Col>*/}
-                                        {/*</Row>*/}
-                                        {/*<Row style={{width: '20em', height: '11em'}}>*/}
-                                        {/*    /!*    <Card className="" style={{minHeight:"15em", minWidth:"109em", marginLeft:"32%"}}>*!/*/}
-                                        {/*    /!*        <CardHeader >*!/*/}
-                                        {/*    /!*            <h3 className="">Final Result</h3>*!/*/}
-                                        {/*    /!*            <CardTitle tag="h2" style={{marginTop:"2%"}}>*!/*/}
-                                        {/*    /!*                <i className="tim-icons icon-bell-55 text-info" /> Ubata Ledak Naaaa*!/*/}
-                                        {/*    /!*            </CardTitle>*!/*/}
-                                        {/*    /!*        </CardHeader>*!/*/}
-                                        {/*    /!*        /!*<CardBody>*!/*!/*/}
-
-                                        {/*    /!*        /!*</CardBody>*!/*!/*/}
-                                        {/*    /!*    </Card>*!/*/}
-                                        {/*</Row>*/}
                                     </Col>
                                 </Row>
 
@@ -650,12 +571,3 @@ class MainDashboard extends Component {
 export default withRouter(MainDashboard);
 
 
-// style={{
-                             //     border: "5px solid #013a55",
-                             //     width: "35%",
-                             //     minHeight: "40%",
-                             //     marginLeft: "auto",
-                             //     marginRight: "auto",
-                             //     alignContent: "center",
-                             //     borderRadius: "5%"
-                             // }}

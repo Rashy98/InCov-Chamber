@@ -1,10 +1,23 @@
+"""
+    This module will recognize the users through face recognition
+
+"""
+
+# Importing needed libraries
 import face_recognition
 import cv2 as cv
 import numpy as np
 import os
 
+
 def run_face_recog(cap0):
-    # cap0 = cv.VideoCapture(0)
+
+    """
+        Performs face recognition
+
+        :param cap0: camera instance for web camera
+        :return: name: Recognized person's name
+    """
 
     known_face_encodings = []
     known_face_names = []
@@ -44,11 +57,6 @@ def run_face_recog(cap0):
                 matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
                 name = "Unknown"
 
-                # # If a match was found in known_face_encodings, just use the first one.
-                # if True in matches:
-                #     first_match_index = matches.index(True)
-                #     name = known_face_names[first_match_index]
-
                 face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
                 best_match_index = np.argmin(face_distances)
                 if matches[best_match_index]:
@@ -74,6 +82,6 @@ def run_face_recog(cap0):
         if cv.waitKey(20) & 0xFF == ord('q'):
             break
 
-    # cap0.release()
+
     cv.destroyAllWindows()
     return name

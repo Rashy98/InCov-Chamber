@@ -1,4 +1,7 @@
-// import image from "../assets/img/virus.svg"
+/*
+    Component that configure the floating particles of the landing page
+*/
+
 const particlesConfig = {
     particles: {
         number: {

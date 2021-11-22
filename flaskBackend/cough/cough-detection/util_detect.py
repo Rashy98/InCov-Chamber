@@ -1,5 +1,5 @@
 """
-To process and make the data needed for training and testing
+    To process and make the data needed for training and testing
 """
 
 # Importing needed libraries
@@ -20,7 +20,6 @@ data = []    # global variable to store the data
 def make_data():
     """
         Build the data for the cough detection model and saving the pickle file
-
     """
 
     for detect_category in categories_detection:
@@ -49,8 +48,9 @@ def make_data():
 
 def load_data():
     """
-    Retrieve the built data for model training and return the features and labels
-    :return: feature_label_array
+        Retrieve the built data for model training and return the features and labels
+
+        :return: feature_label_array
     """
 
     pickle_detection = open('cough_detection.pickle', 'rb')

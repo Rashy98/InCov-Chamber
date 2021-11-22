@@ -1,29 +1,29 @@
+/*
+    Component that is used to function the flip cards used.
+*/
+
+
+// importing needed libraries
 import Flippy, {FrontSide, BackSide} from 'react-flippy';
 import React, {Component} from "react";
 import {Card, CardHeader, CardTitle} from "reactstrap";
 
-// ... component class
-
 class FlipCard extends Component {
-
 
     render() {
         return (
             <Flippy
-                flipOnHover={false} // default false
+                flipOnHover={false}
                 flipOnClick={false}
-                isFlipped={this.props.flipped}// default false
-                flipDirection="horizontal" // horizontal or vertical
+                isFlipped={this.props.flipped}
+                flipDirection="horizontal"
                 ref={(r) => this.flippy = r}
-                // to use toggle method like this.flippy.toggle()
-                // if you pass isFlipped prop component will be controlled component.
-                // and other props, which will go to div
                 style={{
                     width: '60%',
                     height: '10%',
                     marginLeft: '20%',
                     boxShadow: "0 0px 0px 0 rgba(0,0,0,.2)"
-                }} /// these are optional style, it is not necessary
+                }}
             >
                 <FrontSide style={{boxShadow: "0 0px 0px 0 rgba(0,0,0,.2)"}}>
                     <Card >
@@ -33,12 +33,10 @@ class FlipCard extends Component {
                                  {this.props.currentStatus}
                             </CardTitle>
                         </CardHeader>
-                        {/*<CardBody>*/}
 
-                        {/*</CardBody>*/}
                     </Card>
-
                 </FrontSide>
+
                 <BackSide style={{boxShadow: "0 0px 0px 0 rgba(0,0,0,.2)"}}>
                     <Card style={{backgroundColor : "#60BFAA"}}>
                         <CardHeader style={{minHeight: "9em"}}>
@@ -47,9 +45,6 @@ class FlipCard extends Component {
                                  {this.props.componentValue}
                             </CardTitle>
                         </CardHeader>
-                        {/*<CardBody>*/}
-
-                        {/*</CardBody>*/}
                     </Card>
                 </BackSide>
             </Flippy>

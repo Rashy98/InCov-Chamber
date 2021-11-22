@@ -1,44 +1,41 @@
+"""
+    Train the voice recognition model
+"""
 
+# Importing needed libraries
 import os
 import pandas as pd
 import librosa
-
-
 import matplotlib.pyplot as plt
-from keras.utils.np_utils import to_categorical
-
 import numpy as np
-
+import tensorflow as tf
+from keras.utils.np_utils import to_categorical
 from sklearn.preprocessing import StandardScaler
-
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
-
-import tensorflow as tf
-
 from keras.callbacks import EarlyStopping
-
-
-
 from sklearn.preprocessing import LabelEncoder
 
 
-
+# Read data from the csv to a dataframe
 df = pd.read_csv('speaker_dataset.csv')
 df = df.sample(frac=1).reset_index(drop=True)
-#
+
+# Break the dataset into train and test sets
 df_train = df[:200]
-# tf.convert_to_tensor(df_train)
-# df_train = np.array(df_train, dtype=np.float)
 df_test = df[201:]
-#
-print(df_train['speaker'].value_counts(normalize=True))
 
 
 def extract_features(files):
 
-    file_name = os.path.join('./Data/'+str(files.speaker)+'/' + str(files.file))
+    """
+        Extracts the labels and features needed for the model training
+        :param files: File containing the dataset
+        :return: mfccs, chroma, mel, contrast, tonnetz, label: All the features and labels of the dataset needed
+                for model training
+    """
 
+    file_name = os.path.join('./Data/'+str(files.speaker)+'/' + str(files.file))
 
     X, sample_rate = librosa.load(file_name, res_type='kaiser_fast')
 
@@ -59,10 +56,11 @@ def extract_features(files):
 
     return mfccs, chroma, mel, contrast, tonnetz, label
 
-features_label = df.apply(extract_features, axis=1)
 
+features_label = df.apply(extract_features, axis=1)
 features = []
 print(features_label)
+
 for i in range(0, len(features_label)):
     features.append(np.concatenate((features_label[i][0], features_label[i][1],
                 features_label[i][2], features_label[i][3],
@@ -73,19 +71,16 @@ print(df['speaker'].nunique())
 speaker = []
 
 for i in range(0, len(df)):
-    # print(df['speaker'][i])
+
     speaker.append(df['speaker'][i])
 
 X = np.array(features, dtype=np.float)
-# X = np.asarray(X).astype('float32')
 
 labels = speaker
-# print(labels)
 np.unique(labels, return_counts=True)
 
-# y = np.array(df['speaker'])
 y = np.array(labels)
-# y = np.asarray(y).astype('float32')
+
 
 # Hot encoding y
 lb = LabelEncoder()
@@ -95,15 +90,11 @@ y = to_categorical(lb.fit_transform(y))
 X_train = X[:200]
 y_train = y[:200]
 
-# X_val = X[9188:11813]
-# y_val = y[9188:11813]
-
 X_test = X[201:]
 y_test = y[201:]
 
 ss = StandardScaler()
 X_train = ss.fit_transform(X_train)
-# X_val = ss.transform(X_val)
 X_test = ss.transform(X_test)
 
 
@@ -154,6 +145,3 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
 plt.show()
-#
-# y_pred = model.predict(X_test)
-# print(classification_report(y_test, y_pred))
