@@ -12,16 +12,16 @@ def voiceText(AudioRecording):
         :return: text : Converted text for Yes/No Classification
     """
 
-    r = sr.Recognizer()
+    recognition = sr.Recognizer()
 
     with sr.AudioFile(AudioRecording) as source:
 
         # listen for the data (load audio to memory)
-        r.adjust_for_ambient_noise(source)
-        audio_data = r.record(source)
+        recognition.adjust_for_ambient_noise(source)
+        audio_data = recognition.record(source)
 
         # recognize (convert from speech to text)
-        text = r.recognize_google(audio_data)
+        text = recognition.recognize_google(audio_data)
         print(text)
     return text
 

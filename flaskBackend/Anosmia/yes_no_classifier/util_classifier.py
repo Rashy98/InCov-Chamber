@@ -15,18 +15,18 @@ df = pd.read_csv('./Anosmia/yes_no_classifier/data.txt', delimiter = ",")
 count_vect = CountVectorizer()
 
 
-def getData(df):
+def getData(dataframe):
     """
         retrieving needed data from the dataframe(df)
         :param df
     """
 
     col = ['answer', 'phrase']
-    df = df[col]
-    df = df[pd.notnull(df['phrase'])]
-    df.columns = ['answer', 'phrase']
-    df['answer_id'] = df['answer'].factorize()[0]
-    answer_id_df = df[['answer', 'answer_id']].drop_duplicates().sort_values('answer_id')
+    dataframe = dataframe[col]
+    dataframe = dataframe[pd.notnull(dataframe['phrase'])]
+    dataframe.columns = ['answer', 'phrase']
+    dataframe['answer_id'] = dataframe['answer'].factorize()[0]
+    answer_id_df = dataframe[['answer', 'answer_id']].drop_duplicates().sort_values('answer_id')
     answer_to_id = dict(answer_id_df.values)
     id_to_answer = dict(answer_id_df[['answer_id', 'answer']].values)
 
