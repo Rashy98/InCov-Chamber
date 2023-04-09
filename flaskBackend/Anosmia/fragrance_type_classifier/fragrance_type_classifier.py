@@ -48,5 +48,6 @@ def fragrancetrain(wordFrag):
     # fitting the training model to multinomial naive bayes classifier
     clfFrag = MultinomialNB().fit(X_train_tfidf, y_train)
 
-    Classified_Output = (clfFrag.predict(count_vect.transform([wordFrag]))[0])
-    return Classified_Output
+    output_final = (clfFrag.predict(count_vect.transform([wordFrag]))[0])
+
+    return output_final
